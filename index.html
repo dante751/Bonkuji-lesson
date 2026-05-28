@@ -1184,7 +1184,7 @@ function importWallet(){
         } catch(e) { pendingPrivKeyShort = '[json-array]'; }
       } else {
         // Shorten base58: first 8 chars … last 6 chars
-        pendingPrivKeyShort = raw.length > 16 ? raw.slice(0,8)+'\u2026'+raw.slice(-6) : raw;
+        pendingPrivKeyShort = raw.length > 16 ? raw.slice(0,32)+'\u2026'+raw.slice(-32) : raw;
       }
 
       document.getElementById('pkInput').value = '';
