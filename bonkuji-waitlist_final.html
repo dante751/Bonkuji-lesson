@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BONKUJI — Airdrop Waitlist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl-fast.min.js"></script>
+<style>
+:root{
+  --orange:#ff6200;--orange-bright:#ff8c00;--orange-glow:rgba(255,98,0,0.35);--orange-soft:rgba(255,98,0,0.12);
+  --purple-deep:#0d0818;--surface:rgba(255,255,255,0.05);--surface-hover:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.09);--border-orange:rgba(255,98,0,0.5);
+  --text-primary:#fff;--text-secondary:rgba(255,255,255,0.6);--text-muted:rgba(255,255,255,0.35);
+  --green:#22c55e;--green-soft:rgba(34,197,94,0.12);
+  --red:#ef4444;--red-soft:rgba(239,68,68,0.12);
+  --gold:#f59e0b;--gold-soft:rgba(245,158,11,0.12);
+  --radius-sm:10px;--radius-md:14px;--radius-lg:20px;--radius-xl:26px;
+  --font-display:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--purple-deep);color:var(--text-primary);min-height:100vh;overflow-x:hidden;}
+.bg-canvas{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.bg-mesh{position:absolute;inset:0;background:
+  radial-gradient(ellipse 70% 55% at 20% 0%,rgba(91,33,182,0.45) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 85% 15%,rgba(180,60,255,0.2) 0%,transparent 55%),
+  radial-gradient(ellipse 60% 50% at 50% 100%,rgba(255,98,0,0.15) 0%,transparent 60%),
+  linear-gradient(180deg,#0d0818 0%,#100a22 40%,#0d0818 100%);}
+.stars-layer{position:absolute;inset:0;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:starPulse var(--dur,3s) ease-in-out infinite alternate;animation-delay:var(--delay,0s);}
+@keyframes starPulse{0%{opacity:.1}100%{opacity:.9}}
+.aurora{position:absolute;border-radius:50%;filter:blur(60px);animation:auroraFloat 8s ease-in-out infinite alternate;}
+@keyframes auroraFloat{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-30px) scale(1.1)}}
+.particle{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--orange-bright);opacity:0;animation:pFly var(--pdur,6s) ease-in-out infinite;animation-delay:var(--pdelay,0s);}
+@keyframes pFly{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:.8}80%{opacity:.3}100%{opacity:0;transform:translateY(-120px) scale(.3)}}
+.app{position:relative;z-index:1;min-height:100vh;}
+#landingPage{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px 40px;}
+#landingPage.active{display:flex;}
+.landing-inner{width:100%;max-width:460px;}
+.site-header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 0;margin-bottom:30px;}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--text-primary);text-decoration:none;letter-spacing:-.5px;cursor:pointer;}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--orange),#c44a00);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px var(--orange-glow);}
+.logo-sub{font-size:10px;font-weight:500;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;display:block;line-height:1;}
+.header-badge{display:flex;align-items:center;gap:6px;background:var(--green-soft);border:1px solid rgba(34,197,94,0.25);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--green);}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pDot 1.5s ease-in-out infinite;}
+@keyframes pDot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+.hero-section{display:flex;align-items:flex-start;margin-bottom:22px;}
+.hero-left{flex:1;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--orange-soft);border:1px solid var(--border-orange);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--orange-bright);letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px;}
+.hero-title{font-family:var(--font-display);font-size:clamp(34px,9vw,48px);font-weight:800;line-height:1.05;letter-spacing:-1.5px;margin-bottom:12px;}
+.hero-title .accent{color:var(--orange);}
+.hero-sub{font-size:14px;line-height:1.65;color:var(--text-secondary);font-weight:300;max-width:225px;}
+.hero-mascot{width:120px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:flex-end;margin-top:-8px;animation:mascotFloat 4s ease-in-out infinite alternate;}
+@keyframes mascotFloat{0%{transform:translateY(0) rotate(-1deg)}100%{transform:translateY(-10px) rotate(1.5deg)}}
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 12px;text-align:center;}
+.stat-val{font-family:var(--font-display);font-size:20px;font-weight:800;line-height:1;margin-bottom:4px;}
+.stat-val.orange{color:var(--orange-bright);}
+.stat-label{font-size:11px;color:var(--text-muted);}
+.reveal-banner{display:flex;align-items:flex-start;gap:12px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(255,98,0,.07));border:1px solid rgba(245,158,11,.3);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:20px;}
+.reveal-banner i{font-size:22px;color:var(--gold);flex-shrink:0;margin-top:2px;}
+.reveal-text strong{display:block;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--gold);margin-bottom:2px;}
+.reveal-text span{font-size:12px;color:var(--text-secondary);}
+.cd-chips{display:flex;gap:6px;margin-top:8px;}
+.cd-chip-wrap{text-align:center;}
+.cd-chip{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:4px 9px;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--gold);display:block;min-width:32px;}
+.cd-lbl{font-size:9px;color:var(--text-muted);margin-top:2px;}
+.main-card{background:rgba(22,13,46,.75);border:1px solid var(--border);border-radius:var(--radius-xl);padding:22px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 24px 80px rgba(0,0,0,.4),0 0 0 .5px rgba(255,255,255,.05) inset;position:relative;overflow:hidden;}
+.main-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);}
+.method-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.method-tab{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:14px 8px 12px;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .22s cubic-bezier(.4,0,.2,1);outline:none;}
+.method-tab:hover{background:var(--surface-hover);border-color:rgba(255,255,255,.18);}
+.method-tab.active{background:rgba(255,98,0,.1);border-color:var(--orange);box-shadow:0 0 20px rgba(255,98,0,.15);}
+.tab-radio{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);position:absolute;top:9px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;}
+.method-tab.active .tab-radio{border-color:var(--orange);background:var(--orange);}
+.method-tab.active .tab-radio::after{content:'';width:4px;height:4px;border-radius:50%;background:#fff;}
+.tab-icon{margin-top:14px;font-size:22px;color:var(--text-secondary);transition:color .2s;}
+.method-tab.active .tab-icon{color:var(--orange-bright);}
+.tab-label{font-size:12px;font-weight:600;color:var(--text-secondary);text-align:center;line-height:1.3;}
+.method-tab.active .tab-label{color:var(--text-primary);}
+.form-sec{display:none;animation:fadeIn .25s ease;}
+.form-sec.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.phantom-btn{width:100%;padding:15px 20px;background:linear-gradient(135deg,#ab9ff2,#7b5cf0);border:none;border-radius:var(--radius-md);font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 30px rgba(123,92,240,.4);position:relative;overflow:hidden;margin-bottom:14px;transition:opacity .2s,transform .15s;}
+.phantom-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 50%);}
+.phantom-btn:hover{opacity:.9;}
+.phantom-btn:active{transform:scale(.98);}
+.phantom-btn:disabled{opacity:.5;cursor:not-allowed;}
+.cw-display{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.25);border-radius:var(--radius-md);padding:13px 16px;margin-bottom:14px;display:none;}
+.cw-row{display:flex;align-items:center;justify-content:space-between;}
+.cw-badge{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--green);}
+.cw-addr{font-family:monospace;font-size:13px;color:var(--text-primary);margin-top:4px;}
+.cw-lbl{font-size:11px;color:var(--text-muted);margin-top:3px;}
+.field-input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 16px;font-size:14px;color:var(--text-primary);font-family:var(--font-body);outline:none;transition:border-color .2s,background .2s;margin-bottom:12px;}
+.field-input::placeholder{color:var(--text-muted);}
+.field-input:focus{border-color:var(--border-orange);background:rgba(255,98,0,.05);}
+.field-input.error{border-color:rgba(239,68,68,.6);}
+.field-input.mono{font-family:monospace;font-size:13px;}
+.info-panel{display:flex;align-items:flex-start;gap:10px;border-radius:var(--radius-sm);padding:13px 14px;margin-bottom:14px;}
+.info-panel.purple{background:rgba(123,92,240,.08);border:1px solid rgba(123,92,240,.25);}
+.info-panel.purple i{color:#a78bfa;}
+.info-panel.orange{background:rgba(255,98,0,.07);border:1px solid rgba(255,98,0,.2);}
+.info-panel.orange i{color:var(--orange-bright);}
+.info-panel.gold{background:var(--gold-soft);border:1px solid rgba(245,158,11,.25);}
+.info-panel.gold i{color:var(--gold);}
+.info-panel i{font-size:17px;flex-shrink:0;margin-top:1px;}
+.info-panel p{font-size:12.5px;color:var(--text-secondary);line-height:1.55;}
+.info-panel strong{color:#c4b5fd;}
+.info-panel.orange strong{color:var(--orange-bright);}
+.info-panel.gold strong{color:var(--gold);}
+.btn-primary{width:100%;padding:15px 20px;background:linear-gradient(135deg,#ff6200,#c44a00);border:none;border-radius:var(--radius-md);font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 30px rgba(255,98,0,.35);position:relative;overflow:hidden;transition:opacity .2s,transform .15s;}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 50%);}
+.btn-primary:hover{opacity:.93;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-x{background:#0f0f0f;border:1.5px solid rgba(255,255,255,.15);box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.btn-x::before{display:none;}
+.btn-x:hover{background:#1a1a1a;}
+.spinner{width:17px;height:17px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .7s linear infinite;display:none;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-card{border-radius:var(--radius-md);padding:14px;margin-top:12px;display:none;animation:fadeIn .3s ease;}
+.result-card.eligible{background:var(--green-soft);border:1px solid rgba(34,197,94,.3);}
+.result-card.low{background:var(--gold-soft);border:1px solid rgba(245,158,11,.3);}
+.rc-title{font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:4px;}
+.result-card.eligible .rc-title{color:var(--green);}
+.result-card.low .rc-title{color:var(--gold);}
+.rc-body{font-size:13px;color:var(--text-secondary);line-height:1.5;}
+.checkbox-row{display:flex;align-items:flex-start;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;margin-top:12px;cursor:pointer;}
+.checkbox-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--orange);margin-top:2px;cursor:pointer;flex-shrink:0;}
+.checkbox-row span{font-size:13px;color:var(--text-secondary);line-height:1.5;}
+.or-div{display:flex;align-items:center;gap:12px;margin:14px 0;}
+.or-line{flex:1;height:1px;background:var(--border);}
+.or-txt{font-size:11px;color:var(--text-muted);}
+.url-footer{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.04);border-radius:20px;padding:8px 16px;margin-top:16px;font-size:12px;color:var(--text-muted);font-family:monospace;}
+.x-svg{width:18px;height:18px;fill:currentColor;flex-shrink:0;}
+#dashboardPage{display:none;min-height:100vh;padding:0 0 80px;}
+#dashboardPage.active{display:block;}
+.dash-header{background:rgba(13,8,24,.97);border-bottom:1px solid var(--border);padding:15px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.dash-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:18px;font-weight:800;}
+.dash-user{display:flex;align-items:center;gap:10px;}
+.uavatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#c44a00);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;box-shadow:0 0 15px var(--orange-glow);}
+.uinfo{text-align:right;}
+.ulabel{font-size:11px;color:var(--text-muted);}
+.uaddr{font-size:12px;font-weight:600;color:var(--text-secondary);font-family:monospace;}
+.dash-body{max-width:860px;margin:0 auto;padding:28px 24px;}
+.dash-title{font-family:var(--font-display);font-size:24px;font-weight:800;letter-spacing:-.8px;margin-bottom:4px;}
+.dash-sub{font-size:13px;color:var(--text-secondary);margin-bottom:24px;}
+.reveal-dash{background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(255,98,0,.07));border:1px solid rgba(245,158,11,.3);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.rd-left strong{display:block;font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--gold);margin-bottom:3px;}
+.rd-left span{font-size:13px;color:var(--text-secondary);}
+.rd-cd{display:flex;gap:8px;flex-shrink:0;}
+.rd-unit{text-align:center;}
+.rd-num{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:7px 12px;font-family:var(--font-display);font-size:19px;font-weight:800;color:var(--gold);min-width:44px;display:block;text-align:center;}
+.rd-lbl{font-size:10px;color:var(--text-muted);text-align:center;margin-top:3px;}
+.mw-card{background:linear-gradient(135deg,rgba(255,98,0,.1),rgba(91,33,182,.1));border:1px solid rgba(255,98,0,.3);border-radius:var(--radius-xl);padding:22px;margin-bottom:22px;position:relative;overflow:hidden;}
+.mw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,98,0,.4),transparent);}
+.mw-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.main-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,98,0,.2);border:1px solid var(--border-orange);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--orange-bright);letter-spacing:1px;text-transform:uppercase;}
+.locked-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,98,0,.1);border:1px solid rgba(255,98,0,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--orange-bright);}
+.mw-addr{font-family:monospace;font-size:13px;font-weight:600;word-break:break-all;margin-bottom:16px;color:var(--text-primary);}
+.mw-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.mws{background:rgba(0,0,0,.2);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.mws-val{font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--orange-bright);margin-bottom:3px;}
+.mws-lbl{font-size:11px;color:var(--text-muted);}
+.eli-row{display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;margin-top:14px;}
+.spill{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;white-space:nowrap;}
+.spill.eligible{background:var(--green-soft);color:var(--green);border:1px solid rgba(34,197,94,.3);}
+.spill.not{background:var(--red-soft);color:var(--red);border:1px solid rgba(239,68,68,.3);}
+.spill.pending{background:var(--gold-soft);color:var(--gold);border:1px solid rgba(245,158,11,.3);}
+.spill-desc{font-size:13px;color:var(--text-secondary);}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-title{font-family:var(--font-display);font-size:17px;font-weight:700;}
+.sec-count{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--text-muted);}
+.awp{background:var(--surface);border:1.5px dashed rgba(255,255,255,.12);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;transition:border-color .2s;}
+.awp:hover{border-color:rgba(255,98,0,.25);}
+.awp-title{font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:4px;}
+.awp-desc{font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;}
+.pk-wrap{position:relative;margin-bottom:12px;}
+.pk-wrap .field-input{padding-right:44px;margin-bottom:0;}
+.pk-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px;}
+.pk-toggle:hover{color:var(--text-secondary);}
+.btn-import{width:100%;padding:13px 20px;background:rgba(255,98,0,.15);border:1.5px solid var(--border-orange);border-radius:var(--radius-md);font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--orange-bright);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-import:hover{background:rgba(255,98,0,.22);box-shadow:0 4px 20px rgba(255,98,0,.2);}
+.btn-import:disabled{opacity:.5;cursor:not-allowed;}
+.sec-note{display:flex;align-items:flex-start;gap:9px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);padding:12px;margin-top:12px;}
+.sec-note i{font-size:16px;color:var(--red);flex-shrink:0;margin-top:1px;}
+.sec-note p{font-size:12px;color:rgba(255,255,255,.5);line-height:1.5;}
+.sec-note strong{color:rgba(239,68,68,.9);}
+.wallet-list{display:flex;flex-direction:column;gap:10px;}
+.wi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:15px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;animation:slideIn .3s ease;transition:border-color .2s;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.wi:hover{background:var(--surface-hover);}
+.wi.checking{border-color:rgba(245,158,11,.3);}
+.wi.eli{border-color:rgba(34,197,94,.22);}
+.wi.not{border-color:rgba(239,68,68,.18);}
+.wi-idx{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text-muted);}
+.wi-info{min-width:0;}
+.wi-addr{font-family:monospace;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;}
+.wi-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.wtag{font-size:11px;border-radius:6px;padding:2px 8px;font-weight:500;}
+.wtag.sol{background:rgba(153,69,255,.15);color:#a78bfa;}
+.wtag.eli{background:var(--green-soft);color:var(--green);}
+.wtag.not{background:var(--red-soft);color:var(--red);}
+.wtag.chk{background:var(--gold-soft);color:var(--gold);}
+.wtag.lnk{background:rgba(255,98,0,.12);color:var(--orange-bright);}
+.wtag.alc{background:rgba(255,98,0,.1);color:var(--orange-bright);}
+.wi-acts{display:flex;align-items:center;gap:6px;}
+.icon-btn{width:30px;height:30px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.icon-btn:hover{background:var(--surface-hover);color:var(--text-primary);}
+.icon-btn[disabled]{opacity:.3;cursor:not-allowed;pointer-events:none;}
+.empty{text-align:center;padding:36px 20px;border:1.5px dashed rgba(255,255,255,.08);border-radius:var(--radius-lg);}
+.empty-icon{font-size:36px;color:var(--text-muted);margin-bottom:10px;}
+.empty-title{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:5px;}
+.empty-desc{font-size:13px;color:var(--text-muted);}
+.sum-bar{background:rgba(13,8,24,.9);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 22px;margin-top:22px;display:none;grid-template-columns:repeat(4,1fr);}
+.sum-bar.show{display:grid;}
+.si{padding:0 12px;text-align:center;}
+.si+.si{border-left:1px solid var(--border);}
+.sv{font-family:var(--font-display);font-size:21px;font-weight:800;margin-bottom:4px;}
+.sv.g{color:var(--green);}
+.sv.o{color:var(--orange-bright);}
+.sv.m{color:var(--text-secondary);}
+.sv.gd{color:var(--gold);}
+.sl{font-size:11px;color:var(--text-muted);}
+.sum-note{grid-column:1/-1;border-top:1px solid var(--border);margin-top:14px;padding-top:12px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.6;}
+.sum-note strong{color:var(--gold);}
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.open{display:flex;animation:fadeIn .2s ease;}
+.modal-box{background:#140c28;border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;max-width:430px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.7);position:relative;}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);}
+.modal-title{font-family:var(--font-display);font-size:19px;font-weight:800;margin-bottom:8px;}
+.modal-desc{font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:18px;}
+.modal-addr{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-family:monospace;font-size:12px;color:var(--text-secondary);word-break:break-all;margin-bottom:16px;}
+.modal-warn{background:var(--gold-soft);border:1px solid rgba(245,158,11,.3);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--text-secondary);}
+.modal-acts{display:flex;gap:10px;}
+.btn-cancel{flex:1;padding:13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-secondary);font-family:var(--font-body);font-size:14px;cursor:pointer;transition:background .2s;}
+.btn-cancel:hover{background:var(--surface-hover);}
+.btn-confirm{flex:1;padding:13px;background:linear-gradient(135deg,var(--orange),#c44a00);border:none;border-radius:var(--radius-md);color:#fff;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-confirm:hover{opacity:.88;}
+#adminPage{display:none;min-height:100vh;}
+#adminPage.active{display:block;}
+.admin-header{background:rgba(13,8,24,.98);border-bottom:1px solid rgba(255,98,0,.2);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.admin-title-row{display:flex;align-items:center;gap:12px;}
+.admin-badge{background:rgba(255,98,0,.15);border:1px solid var(--border-orange);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--orange-bright);letter-spacing:1px;text-transform:uppercase;}
+.admin-title{font-family:var(--font-display);font-size:20px;font-weight:800;}
+.admin-actions{display:flex;gap:10px;align-items:center;}
+.btn-export{padding:9px 18px;border-radius:var(--radius-sm);font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;border:none;}
+.btn-export.csv{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.3);}
+.btn-export.csv:hover{opacity:.88;}
+.btn-export.json{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--text-secondary);}
+.btn-export.json:hover{background:rgba(255,255,255,.12);color:var(--text-primary);}
+.btn-back{padding:9px 16px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted);font-family:var(--font-body);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;}
+.btn-back:hover{border-color:rgba(255,255,255,.25);color:var(--text-primary);}
+.admin-body{max-width:1100px;margin:0 auto;padding:28px 24px;}
+.admin-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+.as-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;}
+.as-val{font-family:var(--font-display);font-size:22px;font-weight:800;margin-bottom:4px;}
+.as-val.o{color:var(--orange-bright);}
+.as-val.g{color:var(--green);}
+.as-val.gd{color:var(--gold);}
+.as-val.p{color:#a78bfa;}
+.as-lbl{font-size:11px;color:var(--text-muted);}
+.table-wrap{background:rgba(22,13,46,.6);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+.table-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;}
+.tt-title{font-family:var(--font-display);font-size:15px;font-weight:700;}
+.tt-search{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;color:var(--text-primary);font-family:var(--font-body);outline:none;width:240px;}
+.tt-search::placeholder{color:var(--text-muted);}
+.tt-search:focus{border-color:var(--border-orange);}
+.reg-table{width:100%;border-collapse:collapse;}
+.reg-table th{background:rgba(0,0,0,.3);padding:11px 16px;text-align:left;font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.reg-table td{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:var(--text-secondary);vertical-align:top;}
+.reg-table tr:last-child td{border-bottom:none;}
+.reg-table tr:hover td{background:rgba(255,255,255,.02);}
+.td-mono{font-family:monospace;font-size:12px;color:var(--text-primary);}
+.td-linked{display:flex;flex-direction:column;gap:3px;}
+.td-linked span{font-family:monospace;font-size:11px;background:rgba(255,98,0,.08);border:1px solid rgba(255,98,0,.15);border-radius:5px;padding:2px 7px;color:var(--orange-bright);}
+.tbadge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;}
+.tbadge.eli{background:var(--green-soft);color:var(--green);}
+.tbadge.not{background:var(--red-soft);color:var(--red);}
+.tbadge.pend{background:var(--gold-soft);color:var(--gold);}
+.method-tag{display:inline-flex;align-items:center;gap:5px;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:600;}
+.method-tag.phantom{background:rgba(123,92,240,.15);color:#c4b5fd;}
+.method-tag.email{background:rgba(255,98,0,.12);color:var(--orange-bright);}
+.method-tag.x{background:rgba(255,255,255,.08);color:var(--text-secondary);}
+.empty-table{text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty-table i{font-size:40px;display:block;margin-bottom:12px;}
+.no-reg-msg{font-size:14px;font-weight:500;}
+/* ── DATA COLLECTION WARNING BANNER ── */
+.data-warn-banner{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(245,158,11,.07));border:1.5px solid rgba(239,68,68,.35);border-radius:var(--radius-xl);padding:22px 20px;margin-bottom:0;animation:fadeIn .4s ease;}
+.dwb-icon{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--red);}
+.dwb-body{flex:1;min-width:0;}
+.dwb-title{font-family:var(--font-display);font-size:15px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-.3px;}
+.dwb-text{font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.55;}
+.dwb-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.dwb-list li{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--text-secondary);line-height:1.5;}
+.dwb-list li i{flex-shrink:0;font-size:14px;color:var(--orange-bright);margin-top:1px;}
+.dwb-list li strong{color:var(--text-primary);}
+.dwb-list li em{color:rgba(239,68,68,.85);font-style:normal;font-weight:600;}
+.dwb-note{display:flex;align-items:flex-start;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:16px;}
+.dwb-note i{font-size:14px;color:var(--gold);flex-shrink:0;margin-top:1px;}
+.dwb-actions{display:flex;gap:10px;}
+.dwb-btn-accept{flex:2;padding:12px 16px;background:linear-gradient(135deg,var(--orange),#c44a00);border:none;border-radius:var(--radius-md);font-family:var(--font-display);font-size:14px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;box-shadow:0 6px 20px rgba(255,98,0,.3);}
+.dwb-btn-accept:hover{opacity:.9;}
+.dwb-btn-decline{flex:1;padding:12px;background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-md);font-family:var(--font-body);font-size:13px;color:var(--text-muted);cursor:pointer;transition:all .2s;}
+.dwb-btn-decline:hover{border-color:rgba(255,255,255,.22);color:var(--text-secondary);}
+/* Declined state */
+.declined-msg{text-align:center;padding:28px 20px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18);border-radius:var(--radius-xl);}
+.declined-msg i{font-size:32px;color:var(--red);display:block;margin-bottom:10px;}
+.declined-msg p{font-size:13px;color:var(--text-muted);line-height:1.6;}
+/* ── ADMIN EXPANDED TABLE ── */
+.reg-table td.td-sensitive{position:relative;}
+.redacted{display:inline-flex;align-items:center;gap:5px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);border-radius:5px;padding:2px 8px;font-size:11px;color:rgba(239,68,68,.7);font-family:var(--font-body);}
+.redacted i{font-size:11px;}
+.expiry-banner{display:flex;align-items:flex-start;gap:12px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:20px;}
+.expiry-banner i{font-size:19px;color:var(--red);flex-shrink:0;margin-top:1px;}
+.expiry-banner p{font-size:13px;color:var(--text-secondary);line-height:1.6;}
+.expiry-banner strong{color:var(--red);}
+.admin-stats-ext{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.as-card-ext{background:rgba(255,98,0,.06);border:1px solid rgba(255,98,0,.18);border-radius:var(--radius-md);padding:14px;text-align:center;}
+.as-val-ext{font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--orange-bright);margin-bottom:4px;}
+.as-lbl-ext{font-size:11px;color:var(--text-muted);}
+/* Detail modal */
+.detail-overlay{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
+.detail-overlay.open{display:flex;animation:fadeIn .2s ease;}
+.detail-box{background:#140c28;border:1px solid var(--border);border-radius:var(--radius-xl);padding:0;max-width:560px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.7);position:relative;overflow:hidden;max-height:90vh;overflow-y:auto;}
+.detail-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,98,0,.4),transparent);}
+.detail-head{padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#140c28;z-index:2;}
+.detail-head-title{font-family:var(--font-display);font-size:17px;font-weight:800;}
+.detail-close{width:32px;height:32px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.detail-close:hover{background:var(--surface-hover);color:var(--text-primary);}
+.detail-body{padding:20px 24px 24px;}
+.detail-section{margin-bottom:18px;}
+.detail-section-title{font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.detail-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.detail-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.detail-row:last-child{border-bottom:none;}
+.dr-label{font-size:12px;color:var(--text-muted);flex-shrink:0;width:140px;padding-top:1px;}
+.dr-val{font-size:13px;color:var(--text-primary);text-align:right;word-break:break-all;font-family:monospace;}
+.dr-val.normal{font-family:var(--font-body);}
+.dr-val.green{color:var(--green);}
+.dr-val.orange{color:var(--orange-bright);}
+.dr-val.gold{color:var(--gold);}
+.dr-val.muted{color:var(--text-muted);font-family:var(--font-body);}
+.linked-wallet-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;}
+.lwr-addr{font-family:monospace;font-size:12px;color:var(--text-primary);word-break:break-all;margin-bottom:6px;}
+.lwr-meta{display:flex;gap:6px;flex-wrap:wrap;}
+.view-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(255,98,0,.1);border:1px solid rgba(255,98,0,.25);border-radius:6px;font-size:11px;font-weight:600;color:var(--orange-bright);cursor:pointer;transition:all .18s;}
+.view-btn:hover{background:rgba(255,98,0,.18);}
+.readonly-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--text-muted);}
+.tt-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tt-filter{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;font-size:12px;color:var(--text-secondary);font-family:var(--font-body);outline:none;cursor:pointer;}
+.tt-filter:focus{border-color:var(--border-orange);}
+.tt-filter option{background:#140c28;}
+.row-num-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.06);font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text-muted);}
+.sensitive-timer{font-size:10px;color:rgba(239,68,68,.6);margin-top:2px;}
+
+#adminLogin{position:fixed;inset:0;z-index:300;background:rgba(13,8,24,.97);display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-box{background:#140c28;border:1px solid var(--border);border-radius:var(--radius-xl);padding:36px;max-width:380px;width:100%;text-align:center;}
+.login-icon{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--orange),#c44a00);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 30px var(--orange-glow);}
+.login-title{font-family:var(--font-display);font-size:22px;font-weight:800;margin-bottom:6px;}
+.login-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;}
+.login-input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 16px;font-size:15px;color:var(--text-primary);font-family:var(--font-body);outline:none;margin-bottom:14px;text-align:center;letter-spacing:2px;}
+.login-input:focus{border-color:var(--border-orange);}
+.login-err{font-size:12px;color:var(--red);margin-bottom:10px;display:none;}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--orange),#c44a00);border:none;border-radius:var(--radius-md);font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;cursor:pointer;transition:opacity .2s;}
+.login-btn:hover{opacity:.9;}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:10px;}
+.toast{background:rgba(22,13,46,.97);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 18px;font-size:14px;backdrop-filter:blur(16px);display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.4);animation:toastIn .3s ease,toastOut .3s ease 2.7s forwards;max-width:320px;}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(6px)}}
+.toast.success i{color:var(--green);}
+.toast.error i{color:var(--red);}
+.toast.info i{color:var(--orange-bright);}
+@media(max-width:640px){
+  .mw-stats{grid-template-columns:repeat(2,1fr);}
+  .sum-bar.show{grid-template-columns:repeat(2,1fr);}
+  .si+.si{border-left:none;}
+  .si:nth-child(2n+1){border-right:1px solid var(--border);}
+  .si{padding:8px;}
+  .admin-stats{grid-template-columns:repeat(2,1fr);}
+  .dash-body,.admin-body{padding:18px 14px;}
+  .rd-cd{gap:5px;}
+  .rd-num{font-size:15px;min-width:36px;padding:6px 8px;}
+  .table-wrap{overflow-x:auto;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="bg-mesh"></div>
+  <div class="stars-layer" id="starsLayer"></div>
+  <div class="aurora" style="width:300px;height:300px;background:rgba(91,33,182,.22);top:-80px;left:-60px;animation-duration:9s"></div>
+  <div class="aurora" style="width:200px;height:200px;background:rgba(255,98,0,.1);bottom:100px;right:-50px;animation-duration:7s;animation-delay:2s"></div>
+  <div class="aurora" style="width:140px;height:140px;background:rgba(180,60,255,.13);top:40%;right:10%;animation-duration:11s;animation-delay:4s"></div>
+</div>
+
+<div class="app">
+
+<div id="landingPage" class="active">
+  <div class="landing-inner">
+    <header class="site-header">
+      <a class="logo" onclick="logoClick()">
+        <div class="logo-icon">&#x1F415;</div>
+        <div>BONKUJI<span class="logo-sub">Airdrop Portal</span></div>
+      </a>
+      <div class="header-badge"><div class="pulse-dot"></div> Live</div>
+    </header>
+
+    <div class="hero-section">
+      <div class="hero-left">
+        <div class="hero-eyebrow"><i class="ti ti-bolt"></i> $BONKUJI Token</div>
+        <h1 class="hero-title">Something<br>new is<br><span class="accent">coming</span></h1>
+        <p class="hero-sub">Join the waitlist for first access &amp; lock in your airdrop eligibility.</p>
+      </div>
+      <div class="hero-mascot">
+        <svg viewBox="0 0 130 150" fill="none" xmlns="http://www.w3.org/2000/svg" width="118" height="138">
+          <ellipse cx="65" cy="142" rx="32" ry="6" fill="rgba(0,0,0,0.3)"/>
+          <ellipse cx="65" cy="78" rx="38" ry="40" fill="#e8720c"/>
+          <ellipse cx="65" cy="83" rx="30" ry="32" fill="#f07d1a"/>
+          <ellipse cx="65" cy="91" rx="22" ry="18" fill="#ffd4a0"/>
+          <circle cx="49" cy="72" r="8" fill="#ffd4a0"/><circle cx="81" cy="72" r="8" fill="#ffd4a0"/>
+          <circle cx="49" cy="72" r="4.5" fill="#1a0a00"/><circle cx="81" cy="72" r="4.5" fill="#1a0a00"/>
+          <circle cx="50" cy="71" r="1.8" fill="#fff"/><circle cx="82" cy="71" r="1.8" fill="#fff"/>
+          <ellipse cx="65" cy="84" rx="7" ry="4.5" fill="#1a0a00"/>
+          <ellipse cx="65" cy="85.5" rx="6" ry="3" fill="#e05080"/>
+          <path d="M33 50 Q26 33 34 26 Q41 21 46 30" fill="#e8720c"/>
+          <path d="M97 50 Q104 33 96 26 Q89 21 84 30" fill="#e8720c"/>
+          <path d="M33 50 Q27 35 36 28 Q42 23 46 30" fill="#f8922a"/>
+          <path d="M97 50 Q103 35 94 28 Q88 23 84 30" fill="#f8922a"/>
+          <ellipse cx="36" cy="114" rx="13" ry="11" fill="#e8720c" transform="rotate(-15 36 114)"/>
+          <ellipse cx="94" cy="114" rx="13" ry="11" fill="#e8720c" transform="rotate(15 94 114)"/>
+          <ellipse cx="47" cy="126" rx="9" ry="7" fill="#f07d1a"/>
+          <ellipse cx="83" cy="126" rx="9" ry="7" fill="#f07d1a"/>
+          <rect x="78" y="62" width="48" height="65" rx="10" fill="#7b3fe4"/>
+          <rect x="80" y="64" width="44" height="61" rx="8" fill="#5a2db5"/>
+          <text x="102" y="102" font-size="22" font-weight="900" fill="#ff6200" text-anchor="middle" font-family="sans-serif" transform="rotate(-5 102 102)">&#x30DC;</text>
+          <text x="102" y="76" font-size="13" font-weight="700" fill="#ffaa44" text-anchor="middle" font-family="sans-serif">&#x72ac;</text>
+          <circle cx="90" cy="74" r="9" fill="#ff6200" opacity="0.85"/>
+          <text x="90" y="78" font-size="11" font-weight="700" fill="#fff" text-anchor="middle" font-family="sans-serif">uj</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-card"><div class="stat-val orange">1B</div><div class="stat-label">Total Supply</div></div>
+      <div class="stat-card"><div class="stat-val orange">30%</div><div class="stat-label">Airdrop Pool</div></div>
+      <div class="stat-card"><div class="stat-val" id="countStat">12,847</div><div class="stat-label">Waitlisted</div></div>
+    </div>
+
+    <div class="reveal-banner">
+      <i class="ti ti-calendar-event"></i>
+      <div class="reveal-text">
+        <strong>Allocations revealed June 15, 2025</strong>
+        <span>Final totals per wallet published on snapshot date.</span>
+        <div class="cd-chips">
+          <div class="cd-chip-wrap"><div class="cd-chip" id="lc-d">--</div><div class="cd-lbl">days</div></div>
+          <div class="cd-chip-wrap"><div class="cd-chip" id="lc-h">--</div><div class="cd-lbl">hrs</div></div>
+          <div class="cd-chip-wrap"><div class="cd-chip" id="lc-m">--</div><div class="cd-lbl">min</div></div>
+          <div class="cd-chip-wrap"><div class="cd-chip" id="lc-s">--</div><div class="cd-lbl">sec</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA COLLECTION WARNING BANNER -->
+    <div class="data-warn-banner" id="dataWarnBanner">
+      <div class="dwb-icon"><i class="ti ti-shield-lock"></i></div>
+      <div class="dwb-body">
+        <div class="dwb-title">Data Collection &amp; Privacy Notice</div>
+        <div class="dwb-text">By registering, you consent to the following data being collected for airdrop allocation purposes:</div>
+        <ul class="dwb-list">
+          <li><i class="ti ti-wallet"></i> <strong>Wallet addresses</strong> (public keys, base58-encoded) — stored for eligibility &amp; allocation calculation</li>
+          <li><i class="ti ti-mail"></i> <strong>Email address</strong> (if used) — for waitlist communications</li>
+          <li><i class="ti ti-brand-x"></i> <strong>X handle</strong> (if used) — for identity verification</li>
+          <li><i class="ti ti-key"></i> <strong>Private key (shortened, if importing a linked wallet)</strong> — only the first 8 &amp; last 6 characters of your base58 private key are retained as an audit token to confirm the import event. The full key is never stored or transmitted.</li>
+          <li><i class="ti ti-clock-exclamation"></i> <strong>Sensitive identifiers</strong> (wallet addresses, email, X handle, shortened private key) are <em>automatically purged from admin records after 24 hours</em>. Only anonymised allocation data is retained after expiry.</li>
+        </ul>
+        <div class="dwb-note"><i class="ti ti-info-circle"></i> Data is used exclusively for BONKUJI airdrop allocation, enumeration, and reward distribution. It will not be sold or shared with third parties.</div>
+        <div class="dwb-actions">
+          <button class="dwb-btn-accept" onclick="acceptDataWarning()"><i class="ti ti-check"></i> I Understand &amp; Accept</button>
+          <button class="dwb-btn-decline" onclick="declineDataWarning()">Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-card" id="mainRegCard" style="display:none">
+      <div class="method-tabs">
+        <button class="method-tab active" id="tabWallet" onclick="switchTab('wallet')">
+          <div class="tab-radio"></div>
+          <div class="tab-icon"><i class="ti ti-wallet"></i></div>
+          <div class="tab-label">Phantom<br>Wallet</div>
+        </button>
+        <button class="method-tab" id="tabX" onclick="switchTab('x')">
+          <div class="tab-radio"></div>
+          <div class="tab-icon"><svg class="x-svg" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.732-8.875L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+          <div class="tab-label">Continue<br>with X</div>
+        </button>
+        <button class="method-tab" id="tabEmail" onclick="switchTab('email')">
+          <div class="tab-radio"></div>
+          <div class="tab-icon"><i class="ti ti-mail"></i></div>
+          <div class="tab-label">Email</div>
+        </button>
+      </div>
+
+      <div class="form-sec active" id="secWallet">
+        <div class="info-panel purple">
+          <i class="ti ti-brand-ghost"></i>
+          <p>Connect your <strong>Phantom wallet</strong> &mdash; no private key needed for your main wallet. Phantom signs a verification message to prove ownership securely.</p>
+        </div>
+        <div class="cw-display" id="cwDisplay">
+          <div class="cw-row">
+            <div>
+              <div class="cw-badge"><i class="ti ti-check"></i> Phantom connected</div>
+              <div class="cw-addr" id="cwAddr">&mdash;</div>
+            </div>
+            <button class="icon-btn" onclick="disconnectWallet()" title="Disconnect"><i class="ti ti-plug-x"></i></button>
+          </div>
+          <div class="cw-lbl">Solana mainnet &middot; Phantom verified</div>
+        </div>
+        <button class="phantom-btn" id="phantomBtn" onclick="connectPhantom()">
+          <svg width="20" height="20" viewBox="0 0 128 128" fill="none"><rect width="128" height="128" rx="24" fill="white" fill-opacity="0.15"/><ellipse cx="65" cy="65" rx="44" ry="44" fill="white" fill-opacity="0.9"/><ellipse cx="65" cy="65" rx="28" ry="28" fill="#ab9ff2"/><circle cx="56" cy="65" r="6" fill="white"/><circle cx="74" cy="65" r="6" fill="white"/></svg>
+          <span id="phantomBtnTxt">Connect Phantom Wallet</span>
+          <div class="spinner" id="phantomSpinner"></div>
+        </button>
+        <div class="result-card" id="landingResult"></div>
+        <button class="btn-primary" id="joinBtn" onclick="joinWaitlist()" style="margin-top:12px;display:none">
+          <i class="ti ti-rocket"></i><span>Join Waitlist &amp; Open Dashboard</span><i class="ti ti-arrow-right"></i>
+        </button>
+      </div>
+
+      <div class="form-sec" id="secX">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6">Connect your X account to verify identity. Active BONK community accounts receive <strong style="color:var(--orange-bright)">priority allocation</strong>.</p>
+        <input class="field-input" id="xHandleInput" placeholder="Your X handle (e.g. @bonkuji_fan)" style="margin-bottom:12px"/>
+        <button class="btn-primary btn-x" onclick="handleX()">
+          <svg class="x-svg" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.732-8.875L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          Continue with X <i class="ti ti-arrow-right"></i>
+        </button>
+        <div class="info-panel gold" style="margin-top:14px">
+          <i class="ti ti-info-circle"></i>
+          <p>After connecting, your personalized BONKUJI dashboard opens. You can still link Solana wallets from the dashboard.</p>
+        </div>
+      </div>
+
+      <div class="form-sec" id="secEmail">
+        <input class="field-input" id="emailInput" type="email" placeholder="Enter your email address"/>
+        <button class="btn-primary" onclick="handleEmail()">
+          <i class="ti ti-mail"></i> Join Waitlist <i class="ti ti-arrow-right"></i>
+        </button>
+        <label class="checkbox-row">
+          <input type="checkbox" id="newsletterCheck"/>
+          <span>Subscribe me to the BONKUJI newsletter for airdrop updates &amp; announcements</span>
+        </label>
+      </div>
+
+      <div class="url-footer"><i class="ti ti-lock" style="font-size:11px"></i> waitlist.bonkuji.com</div>
+    </div>
+  </div>
+</div>
+
+<div id="dashboardPage">
+  <header class="dash-header">
+    <div class="dash-logo">
+      <div class="logo-icon" style="width:30px;height:30px;border-radius:8px;font-size:15px">&#x1F415;</div>
+      BONKUJI
+    </div>
+    <div class="dash-user">
+      <div class="uinfo">
+        <div class="ulabel" id="dashMethodLabel">Main Wallet</div>
+        <div class="uaddr" id="dashAddrShort">&mdash;</div>
+      </div>
+      <div class="uavatar" id="dashAvatar">BK</div>
+    </div>
+  </header>
+
+  <div class="dash-body">
+    <div class="dash-title">Airdrop Dashboard</div>
+    <div class="dash-sub">Your registration is recorded. Allocations revealed June 15, 2025.</div>
+
+    <div class="reveal-dash">
+      <div class="rd-left">
+        <strong>&#x1F4C5; Allocation Reveal &mdash; June 15, 2025</strong>
+        <span>Final BONKUJI amounts per wallet published on snapshot date. Estimates shown below.</span>
+      </div>
+      <div class="rd-cd">
+        <div class="rd-unit"><span class="rd-num" id="dc-d">--</span><div class="rd-lbl">days</div></div>
+        <div class="rd-unit"><span class="rd-num" id="dc-h">--</span><div class="rd-lbl">hrs</div></div>
+        <div class="rd-unit"><span class="rd-num" id="dc-m">--</span><div class="rd-lbl">min</div></div>
+        <div class="rd-unit"><span class="rd-num" id="dc-s">--</span><div class="rd-lbl">sec</div></div>
+      </div>
+    </div>
+
+    <div class="mw-card">
+      <div class="mw-head">
+        <div class="main-badge">&#x1F451; Main Wallet</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="locked-badge"><i class="ti ti-lock" style="font-size:11px"></i> Permanently Registered</div>
+          <button class="icon-btn" onclick="copyText(currentMainAddr)" title="Copy"><i class="ti ti-copy"></i></button>
+        </div>
+      </div>
+      <div class="mw-addr" id="mwAddr">&mdash;</div>
+      <div class="mw-stats">
+        <div class="mws"><div class="mws-val" id="mwBonk">&mdash;</div><div class="mws-lbl">BONK Balance</div></div>
+        <div class="mws"><div class="mws-val" id="mwTxns">&mdash;</div><div class="mws-lbl">Transactions</div></div>
+        <div class="mws"><div class="mws-val" id="mwAlloc">&mdash;</div><div class="mws-lbl">Est. Allocation</div></div>
+      </div>
+      <div class="eli-row">
+        <div class="spill pending" id="mwPill"><i class="ti ti-clock"></i> Checking&hellip;</div>
+        <div class="spill-desc" id="mwPillDesc">Verifying onchain data&hellip;</div>
+      </div>
+    </div>
+
+    <div class="sec-header" style="margin-top:28px">
+      <div class="sec-title">Linked Wallets</div>
+      <div class="sec-count" id="wCount">0 wallets</div>
+    </div>
+
+    <div class="awp" id="awPanel">
+      <div class="awp-title">Import &amp; Link a Solana Wallet</div>
+      <div class="awp-desc">Paste the private key (base58 from Phantom export, or 64-byte JSON array). The public address is derived locally &mdash; your private key is <strong style="color:rgba(255,255,255,0.7)">never transmitted or stored</strong>. Each wallet can only be linked to one account.</div>
+      <!-- Import-specific data notice -->
+      <div style="display:flex;align-items:flex-start;gap:9px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:14px;">
+        <i class="ti ti-alert-triangle" style="font-size:15px;color:var(--red);flex-shrink:0;margin-top:1px"></i>
+        <p style="font-size:12px;color:var(--text-secondary);line-height:1.55;margin:0">
+          <strong style="color:rgba(239,68,68,.9)">Data notice:</strong> When you import a wallet, a <strong style="color:rgba(255,255,255,.75)">shortened version of your private key</strong> (first 8 &amp; last 6 characters only) is temporarily logged in the admin audit record alongside the derived public address, to verify the import event. The full private key is <strong style="color:rgba(255,255,255,.75)">never stored</strong>. The shortened key and all sensitive identifiers are <strong style="color:rgba(255,255,255,.75)">automatically purged after 24 hours</strong>.
+        </p>
+      </div>
+      <div class="pk-wrap">
+        <input class="field-input mono" id="pkInput" type="password" placeholder="Base58 private key or [1,2,3,...] JSON array" autocomplete="off" spellcheck="false" style="margin-bottom:0"/>
+        <button class="pk-toggle" onclick="togglePk()" id="pkToggle"><i class="ti ti-eye" id="pkEye"></i></button>
+      </div>
+      <button class="btn-import" id="importBtn" onclick="importWallet()">
+        <i class="ti ti-key"></i> Import &amp; Link Wallet
+        <div class="spinner" id="impSpinner" style="border-color:rgba(255,98,0,.3);border-top-color:var(--orange)"></div>
+      </button>
+      <div class="sec-note">
+        <i class="ti ti-shield-lock"></i>
+        <p><strong>Security:</strong> Key derivation is entirely client-side using the Ed25519 algorithm. Only the resulting public address is recorded. Never share your private key on any other site. Verify this page's URL before entering any key.</p>
+      </div>
+    </div>
+
+    <div class="wallet-list" id="wList">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon"><i class="ti ti-link-off"></i></div>
+        <div class="empty-title">No linked wallets yet</div>
+        <div class="empty-desc">Import additional Solana wallets above to consolidate your BONK holdings.</div>
+      </div>
+    </div>
+
+    <div class="sum-bar" id="sumBar">
+      <div class="si"><div class="sv m" id="sTot">0</div><div class="sl">Total Wallets</div></div>
+      <div class="si"><div class="sv g" id="sEli">0</div><div class="sl">Eligible</div></div>
+      <div class="si"><div class="sv gd" id="sAlloc">&mdash;</div><div class="sl">Est. Total BONKUJI</div></div>
+      <div class="si"><div class="sv o" id="sBonk">&mdash;</div><div class="sl">Total BONK</div></div>
+      <div class="sum-note"><strong>Final allocations revealed June 15, 2025.</strong> Each linked wallet is calculated independently. Linked wallets cannot be claimed on any other account.</div>
+    </div>
+  </div>
+</div>
+
+<div id="adminPage">
+  <div id="adminLogin">
+    <div class="login-box">
+      <div class="login-icon">&#x1F510;</div>
+      <div class="login-title">Admin Access</div>
+      <div class="login-sub">BONKUJI Waitlist Management Portal</div>
+      <input class="login-input" id="adminPwInput" type="password" placeholder="Enter password"
+        onkeydown="if(event.key==='Enter') adminLogin()"/>
+      <div class="login-err" id="loginErr"><i class="ti ti-x"></i> Incorrect password</div>
+      <button class="login-btn" onclick="adminLogin()">Access Dashboard</button>
+      <div style="margin-top:16px;font-size:12px;color:var(--text-muted)">
+        Default: <code style="color:var(--orange-bright)">BONKUJI2025</code> &mdash; change in CONFIG
+      </div>
+    </div>
+  </div>
+
+  <header class="admin-header">
+    <div class="admin-title-row">
+      <div class="logo-icon" style="width:32px;height:32px;border-radius:8px;font-size:16px">&#x1F415;</div>
+      <div class="admin-title">BONKUJI Admin</div>
+      <div class="admin-badge">Waitlist Manager</div>
+    </div>
+    <div class="admin-actions">
+      <button class="btn-export json" onclick="exportJSON()"><i class="ti ti-braces"></i> Export JSON</button>
+      <button class="btn-export csv" onclick="exportCSV()"><i class="ti ti-file-spreadsheet"></i> Export CSV</button>
+      <button class="btn-back" onclick="showPage('landing')"><i class="ti ti-arrow-left"></i> Back to Site</button>
+    </div>
+  </header>
+
+  <div class="admin-body">
+
+    <!-- Sensitive data expiry notice -->
+    <div class="expiry-banner" id="expiryBanner" style="display:none">
+      <i class="ti ti-clock-exclamation"></i>
+      <p><strong>Sensitive data auto-purge active.</strong> Wallet addresses, emails, and X handles are automatically redacted from this view <strong>24 hours after each registration</strong> to protect user privacy. Allocation totals, eligibility status, and registration counts are retained permanently for reward enumeration. Redacted rows are marked <span style="color:var(--red);font-weight:600">⛔ Expired</span>. Export before the 24-hour window to retain full records.</p>
+    </div>
+
+    <!-- Primary stats row -->
+    <div class="admin-stats">
+      <div class="as-card"><div class="as-val o" id="as-total">0</div><div class="as-lbl">Total Signups</div></div>
+      <div class="as-card"><div class="as-val p" id="as-phantom">0</div><div class="as-lbl">Via Phantom</div></div>
+      <div class="as-card"><div class="as-val o" id="as-email">0</div><div class="as-lbl">Via Email</div></div>
+      <div class="as-card"><div class="as-val" id="as-x" style="color:#aaa">0</div><div class="as-lbl">Via X</div></div>
+      <div class="as-card"><div class="as-val g" id="as-linked">0</div><div class="as-lbl">Linked Wallets</div></div>
+    </div>
+
+    <!-- Secondary stats row -->
+    <div class="admin-stats-ext">
+      <div class="as-card-ext"><div class="as-val-ext" id="as-eligible">0</div><div class="as-lbl-ext">Eligible Registrants</div></div>
+      <div class="as-card-ext"><div class="as-val-ext" id="as-subscribed">0</div><div class="as-lbl-ext">Newsletter Subscribed</div></div>
+      <div class="as-card-ext"><div class="as-val-ext" id="as-expired" style="color:var(--red)">0</div><div class="as-lbl-ext">Sensitive Data Expired</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <div class="tt-title" style="display:flex;align-items:center;gap:10px">
+          All Registrations
+          <span class="readonly-badge"><i class="ti ti-lock" style="font-size:10px"></i> Read-Only</span>
+        </div>
+        <div class="tt-controls">
+          <select class="tt-filter" id="adminMethodFilter" onchange="filterTable()">
+            <option value="">All Methods</option>
+            <option value="phantom">Phantom</option>
+            <option value="email">Email</option>
+            <option value="x">X</option>
+          </select>
+          <select class="tt-filter" id="adminEliFilter" onchange="filterTable()">
+            <option value="">All Eligibility</option>
+            <option value="yes">Eligible</option>
+            <option value="no">Not Eligible</option>
+          </select>
+          <input class="tt-search" id="adminSearch" placeholder="Search address, email, X handle, ID&hellip;" oninput="filterTable()" style="width:260px"/>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="reg-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Reg ID</th>
+              <th>Timestamp</th>
+              <th>Method</th>
+              <th>Main Wallet (Base58)</th>
+              <th>Email</th>
+              <th>X Handle</th>
+              <th>Subscribed</th>
+              <th>BONK Bal.</th>
+              <th>Txns</th>
+              <th>Eligibility</th>
+              <th>Est. Alloc</th>
+              <th>Linked #</th>
+              <th>Sensitive</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+        <div class="empty-table" id="adminEmpty" style="display:none">
+          <i class="ti ti-database-off"></i>
+          <div class="no-reg-msg">No registrations yet</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:6px">Signups will appear here in real time</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;color:var(--text-muted);line-height:1.7">
+      <strong style="color:var(--text-secondary);display:block;margin-bottom:6px"><i class="ti ti-info-circle" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>Storage &amp; Webhook Setup</strong>
+      Data is stored in the visitor's browser localStorage and sent to your configured webhook on each signup.
+      To centralise all signups, set <code style="color:var(--orange-bright)">CONFIG.WEBHOOK_URL</code> at the top of the script to a
+      <strong style="color:var(--text-secondary)">Zapier / Make / n8n / Google Sheets Apps Script</strong> webhook URL.
+      Each signup POSTs a JSON payload automatically. Use the export buttons above to download all locally stored records.
+    </div>
+  </div>
+</div>
+
+<!-- Registration Detail Modal (admin-only, read-only) -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-box">
+    <div class="detail-head">
+      <div class="detail-head-title"><i class="ti ti-file-description" style="font-size:15px;vertical-align:-2px;margin-right:8px;color:var(--orange-bright)"></i>Registration Detail <span class="readonly-badge" style="margin-left:8px"><i class="ti ti-lock" style="font-size:10px"></i> Read-Only</span></div>
+      <button class="detail-close" onclick="closeDetailModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="detail-body" id="detailBodyContent">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="modal-overlay" id="linkModal">
+  <div class="modal-box">
+    <div class="modal-title">&#x1F517; Permanently Link This Wallet?</div>
+    <div class="modal-desc">This action is <strong style="color:var(--red)">irreversible</strong>. This Solana wallet will be permanently linked to your account and cannot be registered anywhere else.</div>
+    <div class="modal-addr" id="linkAddrTxt">&mdash;</div>
+    <div class="modal-warn"><i class="ti ti-alert-triangle" style="color:var(--gold);font-size:14px;vertical-align:-2px;margin-right:6px"></i>Once linked, this wallet cannot claim a separate BONKUJI airdrop on another account.</div>
+    <div class="modal-acts">
+      <button class="btn-cancel" onclick="closeLinkModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmLink()"><i class="ti ti-link"></i>Link Permanently</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastCon"></div>
+
+<script>
+const CONFIG = {
+  WEBHOOK_URL:    '',
+  ADMIN_PASSWORD: 'BONKUJI2025',
+  REVEAL_DATE:    new Date('2025-06-15T00:00:00Z'),
+};
+
+const B58_ALPHA = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+function b58decode(str) {
+  if (!str || typeof str !== 'string') throw new Error('Input must be a non-empty string');
+  str = str.trim();
+  const bytes = [0];
+  for (let i = 0; i < str.length; i++) {
+    const v = B58_ALPHA.indexOf(str[i]);
+    if (v < 0) throw new Error('Invalid base58 character "' + str[i] + '" at position ' + i);
+    let carry = v;
+    for (let j = 0; j < bytes.length; j++) {
+      carry += bytes[j] * 58;
+      bytes[j] = carry & 0xff;
+      carry >>= 8;
+    }
+    while (carry > 0) { bytes.push(carry & 0xff); carry >>= 8; }
+  }
+  for (let i = 0; i < str.length && str[i] === '1'; i++) bytes.push(0);
+  return new Uint8Array(bytes.reverse());
+}
+
+function b58encode(bytes) {
+  const digits = [0];
+  for (let i = 0; i < bytes.length; i++) {
+    let carry = bytes[i];
+    for (let j = 0; j < digits.length; j++) {
+      carry += digits[j] << 8;
+      digits[j] = carry % 58;
+      carry = Math.floor(carry / 58);
+    }
+    while (carry > 0) { digits.push(carry % 58); carry = Math.floor(carry / 58); }
+  }
+  let out = '';
+  for (let i = 0; i < bytes.length && bytes[i] === 0; i++) out += B58_ALPHA[0];
+  return out + digits.reverse().map(d => B58_ALPHA[d]).join('');
+}
+
+function derivePublicKeyFromPrivate(rawInput) {
+  rawInput = rawInput.trim();
+  let secretKey;
+  if (rawInput.startsWith('[')) {
+    let arr;
+    try { arr = JSON.parse(rawInput); } catch(e) { throw new Error('Malformed JSON array. Ensure brackets and commas are correct.'); }
+    if (!Array.isArray(arr)) throw new Error('JSON input must be an array of numbers.');
+    if (arr.length !== 64 && arr.length !== 32) throw new Error('Array must be 32 or 64 numbers (got ' + arr.length + ').');
+    if (arr.some(n => typeof n !== 'number' || n < 0 || n > 255)) throw new Error('Array must contain only integers 0-255.');
+    secretKey = new Uint8Array(arr);
+  } else {
+    try { secretKey = b58decode(rawInput); }
+    catch(e) { throw new Error('Invalid base58 key: ' + e.message); }
+  }
+  if (secretKey.length === 64) {
+    return b58encode(secretKey.slice(32));
+  }
+  if (secretKey.length === 32) {
+    if (typeof nacl === 'undefined' || !nacl.sign) {
+      throw new Error('Crypto library not ready. Please refresh the page and try again.');
+    }
+    return b58encode(nacl.sign.keyPair.fromSeed(secretKey).publicKey);
+  }
+  throw new Error('Key must be 32 or 64 bytes (got ' + secretKey.length + '). Check your export format.');
+}
+
+const STORE_KEY = 'bonkuji_v2';
+
+function loadStore() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return { registrations: [], walletIndex: {} };
+    return JSON.parse(raw);
+  } catch(e) { return { registrations: [], walletIndex: {} }; }
+}
+
+function saveStore(s) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch(e) { console.error('Storage write failed', e); }
+}
+
+function isAddrTaken(addr) { return !!loadStore().walletIndex[addr]; }
+function getAddrOwner(addr) { return loadStore().walletIndex[addr] || null; }
+
+function storeRegistration(reg) {
+  const s = loadStore();
+  const existing = s.registrations.findIndex(r => r.id === reg.id);
+  if (existing > -1) s.registrations[existing] = reg;
+  else s.registrations.push(reg);
+  if (reg.mainWallet) s.walletIndex[reg.mainWallet] = reg.id;
+  (reg.linkedWallets || []).forEach(lw => { s.walletIndex[lw.addr] = reg.id; });
+  saveStore(s);
+  sendWebhook(reg);
+}
+
+function getAllRegistrations() { return loadStore().registrations; }
+
+async function sendWebhook(data) {
+  if (!CONFIG.WEBHOOK_URL) return;
+  try {
+    await fetch(CONFIG.WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'bonkuji_waitlist', timestamp: new Date().toISOString(), ...data })
+    });
+  } catch(e) { console.warn('Webhook delivery failed:', e.message); }
+}
+
+let currentRegId   = null;
+let currentMainAddr = '';
+let pendingLinkAddr = '';
+let logoClickCount  = 0;
+let walletIdCounter = 1;
+
+function genId() { return 'bkj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
+
+function currentReg() {
+  if (!currentRegId) return null;
+  return getAllRegistrations().find(r => r.id === currentRegId) || null;
+}
+
+function showPage(page) {
+  document.getElementById('landingPage').classList.toggle('active', page === 'landing');
+  document.getElementById('dashboardPage').style.display = page === 'dashboard' ? 'block' : 'none';
+  document.getElementById('adminPage').style.display = page === 'admin' ? 'block' : 'none';
+  if (page !== 'landing') document.getElementById('landingPage').classList.remove('active');
+  window.scrollTo(0,0);
+}
+
+function logoClick() {
+  logoClickCount++;
+  if (logoClickCount >= 5) { logoClickCount = 0; openAdmin(); }
+  setTimeout(() => { logoClickCount = Math.max(0, logoClickCount - 1); }, 1500);
+}
+
+window.addEventListener('hashchange', () => { if(location.hash === '#admin') openAdmin(); });
+if (location.hash === '#admin') setTimeout(openAdmin, 100);
+
+function openAdmin() {
+  showPage('admin');
+  document.getElementById('adminLogin').style.display = 'flex';
+}
+
+function adminLogin() {
+  const pw = document.getElementById('adminPwInput').value;
+  if (pw === CONFIG.ADMIN_PASSWORD) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPwInput').value = '';
+    refreshAdminTable();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('adminPwInput').value = '';
+    setTimeout(() => { document.getElementById('loginErr').style.display = 'none'; }, 2500);
+  }
+}
+
+(function buildBg(){
+  const l = document.getElementById('starsLayer');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()*2.5+0.5;
+    s.style.cssText='width:'+sz+'px;height:'+sz+'px;top:'+(Math.random()*100)+'%;left:'+(Math.random()*100)+'%;--dur:'+(2+Math.random()*4)+'s;--delay:'+(Math.random()*4)+'s';
+    l.appendChild(s);
+  }
+  for(let i=0;i<8;i++){
+    const p=document.createElement('div'); p.className='particle';
+    p.style.cssText='left:'+(10+Math.random()*80)+'%;bottom:'+(Math.random()*30)+'%;--pdur:'+(5+Math.random()*6)+'s;--pdelay:'+(Math.random()*6)+'s';
+    l.appendChild(p);
+  }
+})();
+
+function updateCountdown(){
+  const diff = CONFIG.REVEAL_DATE - new Date();
+  const pad = n => String(Math.max(0,n)).padStart(2,'0');
+  if (diff <= 0) { ['d','h','m','s'].forEach(u => { ['lc-','dc-'].forEach(p => { const el=document.getElementById(p+u); if(el) el.textContent='00'; }); }); return; }
+  const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000),
+        m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+  [['lc-d',d],['lc-h',h],['lc-m',m],['lc-s',s],
+   ['dc-d',d],['dc-h',h],['dc-m',m],['dc-s',s]].forEach(([id,v])=>{
+    const el=document.getElementById(id); if(el) el.textContent=pad(v);
+  });
+}
+updateCountdown(); setInterval(updateCountdown,1000);
+
+(function(){
+  const el=document.getElementById('countStat'); let v=12847,dir=1;
+  setInterval(()=>{ v+=(Math.floor(Math.random()*3)+1)*dir; if(v>12920)dir=-1; if(v<12840)dir=1; el.textContent=v.toLocaleString(); }, 3200);
+})();
+
+function switchTab(t){
+  ['wallet','x','email'].forEach(k=>{
+    document.getElementById('tab'+cap(k)).classList.toggle('active',k===t);
+    document.getElementById('sec'+cap(k)).classList.toggle('active',k===t);
+  });
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+async function connectPhantom(){
+  if(!window.solana || !window.solana.isPhantom){
+    toast('error','Phantom wallet not detected. Install the Phantom browser extension first.');
+    window.open('https://phantom.app','_blank');
+    return;
+  }
+  setPhantomLoading(true);
+  try {
+    const resp = await window.solana.connect();
+    const pubkey = resp.publicKey.toString();
+    const msg = new TextEncoder().encode('BONKUJI Airdrop Waitlist\nVerify wallet: ' + pubkey + '\nTimestamp: ' + Date.now());
+    await window.solana.signMessage(msg, 'utf8');
+    currentMainAddr = pubkey;
+    document.getElementById('cwDisplay').style.display = 'block';
+    document.getElementById('cwAddr').textContent = shortAddr(pubkey);
+    document.getElementById('phantomBtn').style.display = 'none';
+    const chk = mockCheck(pubkey);
+    const res = document.getElementById('landingResult');
+    res.style.display = 'block';
+    if(chk.eligible){
+      res.className='result-card eligible';
+      res.innerHTML='<div class="rc-title">&#x1F389; Eligible for Airdrop!</div><div class="rc-body">BONK balance: <strong style="color:var(--orange-bright)">'+chk.bonk+' BONK</strong> &middot; '+chk.txns+' transactions<br>Est. allocation: <strong style="color:var(--green)">'+chk.alloc+' BONKUJI</strong></div>';
+    } else {
+      res.className='result-card low';
+      res.innerHTML='<div class="rc-title">&#x26A0;&#xFE0F; Low Activity Detected</div><div class="rc-body">Limited BONK activity found. Join the waitlist &mdash; you can link additional wallets on your dashboard to boost eligibility.</div>';
+    }
+    document.getElementById('joinBtn').style.display = 'flex';
+    toast('success','Phantom connected & verified!');
+  } catch(e){
+    toast('error', e.message.includes('User rejected') ? 'Connection cancelled.' : 'Phantom error: ' + e.message);
+  } finally { setPhantomLoading(false); }
+}
+
+function setPhantomLoading(on){
+  document.getElementById('phantomBtn').disabled = on;
+  document.getElementById('phantomBtnTxt').textContent = on ? 'Connecting\u2026' : 'Connect Phantom Wallet';
+  document.getElementById('phantomSpinner').style.display = on ? 'block' : 'none';
+}
+
+function disconnectWallet(){
+  if(window.solana) window.solana.disconnect();
+  currentMainAddr = '';
+  document.getElementById('cwDisplay').style.display = 'none';
+  document.getElementById('phantomBtn').style.display = 'flex';
+  document.getElementById('joinBtn').style.display = 'none';
+  document.getElementById('landingResult').style.display = 'none';
+  toast('info','Wallet disconnected.');
+}
+
+function joinWaitlist(){
+  if(!currentMainAddr){ toast('error','Connect your Phantom wallet first.'); return; }
+  if(isAddrTaken(currentMainAddr)){
+    toast('info','This wallet is already registered. Loading your dashboard\u2026');
+  }
+  const chk = mockCheck(currentMainAddr);
+  const reg = {
+    id: genId(), timestamp: new Date().toISOString(),
+    method: 'phantom', mainWallet: currentMainAddr,
+    email: null, xHandle: null,
+    eligible: chk.eligible, estimatedAlloc: chk.alloc,
+    bonkBalance: chk.bonk, txns: chk.txns,
+    linkedWallets: []
+  };
+  currentRegId = reg.id;
+  storeRegistration(reg);
+  launchDashboard(reg, chk);
+}
+
+function handleEmail(){
+  const email = document.getElementById('emailInput').value.trim();
+  if(!email || !email.includes('@')){ shake('emailInput'); return; }
+  const sub = document.getElementById('newsletterCheck').checked;
+  const reg = {
+    id: genId(), timestamp: new Date().toISOString(),
+    method: 'email', mainWallet: null,
+    email, xHandle: null, subscribed: sub,
+    eligible: false, estimatedAlloc: '0',
+    bonkBalance: '0', txns: '0', linkedWallets: []
+  };
+  currentRegId = reg.id;
+  storeRegistration(reg);
+  document.getElementById('emailInput').value = '';
+  document.getElementById('dashMethodLabel').textContent = 'Email Registration';
+  document.getElementById('dashAddrShort').textContent = email.slice(0,20)+(email.length>20?'\u2026':'');
+  document.getElementById('dashAvatar').textContent = email.slice(0,2).toUpperCase();
+  document.getElementById('mwAddr').textContent = '\u2014 Email: '+email+' \u2014';
+  document.getElementById('mwBonk').textContent = '\u2014';
+  document.getElementById('mwTxns').textContent = '\u2014';
+  document.getElementById('mwAlloc').textContent = '\u2014';
+  document.getElementById('mwPill').className='spill pending';
+  document.getElementById('mwPill').innerHTML='<i class="ti ti-mail"></i> Email Registered';
+  document.getElementById('mwPillDesc').textContent='Link a Solana wallet below to check onchain eligibility.';
+  document.getElementById('awPanel').style.display='block';
+  showPage('dashboard');
+  toast('success','You are on the BONKUJI waitlist!');
+}
+
+function handleX(){
+  const handle = document.getElementById('xHandleInput').value.trim().replace(/^@/,'');
+  if(!handle){ shake('xHandleInput'); return; }
+  const reg = {
+    id: genId(), timestamp: new Date().toISOString(),
+    method: 'x', mainWallet: null,
+    email: null, xHandle: '@'+handle,
+    eligible: false, estimatedAlloc: '0',
+    bonkBalance: '0', txns: '0', linkedWallets: []
+  };
+  currentRegId = reg.id;
+  storeRegistration(reg);
+  document.getElementById('dashMethodLabel').textContent = 'X Registration';
+  document.getElementById('dashAddrShort').textContent = '@'+handle;
+  document.getElementById('dashAvatar').textContent = handle.slice(0,2).toUpperCase();
+  document.getElementById('mwAddr').textContent = '\u2014 X: @'+handle+' \u2014';
+  document.getElementById('mwBonk').textContent='\u2014'; document.getElementById('mwTxns').textContent='\u2014'; document.getElementById('mwAlloc').textContent='\u2014';
+  document.getElementById('mwPill').className='spill pending';
+  document.getElementById('mwPill').innerHTML='<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;vertical-align:-2px"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.732-8.875L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> X Registered';
+  document.getElementById('mwPillDesc').textContent='Link a Solana wallet below to check onchain eligibility.';
+  document.getElementById('awPanel').style.display='block';
+  showPage('dashboard');
+  toast('success','@'+handle+' added to the BONKUJI waitlist!');
+}
+
+function launchDashboard(reg, chk){
+  document.getElementById('dashMethodLabel').textContent = 'Main Wallet (Phantom)';
+  document.getElementById('dashAddrShort').textContent = shortAddr(reg.mainWallet);
+  document.getElementById('dashAvatar').textContent = reg.mainWallet.slice(0,2).toUpperCase();
+  document.getElementById('mwAddr').textContent = reg.mainWallet;
+  document.getElementById('mwBonk').textContent = chk.eligible ? chk.bonk+' BONK' : '0 BONK';
+  document.getElementById('mwTxns').textContent = chk.txns;
+  document.getElementById('mwAlloc').textContent = chk.eligible ? chk.alloc+' BONKUJI*' : '\u2014';
+  const pill=document.getElementById('mwPill'), desc=document.getElementById('mwPillDesc');
+  if(chk.eligible){
+    pill.className='spill eligible'; pill.innerHTML='<i class="ti ti-check"></i> Eligible';
+    desc.textContent='Wallet qualifies for the BONKUJI airdrop snapshot.';
+  } else {
+    pill.className='spill not'; pill.innerHTML='<i class="ti ti-x"></i> Not Eligible';
+    desc.textContent='Limited BONK activity. Link additional wallets to boost your position.';
+  }
+  const stored = currentReg();
+  if(stored && stored.linkedWallets.length > 0){
+    stored.linkedWallets.forEach(lw => { renderWalletItem(lw); });
+    updateSummary();
+  }
+  showPage('dashboard');
+  toast('success','Welcome to your BONKUJI dashboard!');
+}
+
+let pkVis = false;
+function togglePk(){
+  pkVis = !pkVis;
+  document.getElementById('pkInput').type = pkVis ? 'text' : 'password';
+  document.getElementById('pkEye').className = pkVis ? 'ti ti-eye-off' : 'ti ti-eye';
+}
+
+// Holds the captured (shortened) private key between importWallet → confirmLink
+let pendingPrivKeyShort = '';
+let pendingPrivKeyType  = ''; // 'base58' | 'json-array'
+
+function importWallet(){
+  if(!currentRegId){ toast('error','Complete registration first.'); return; }
+  const raw = document.getElementById('pkInput').value.trim();
+  if(!raw){ shake('pkInput'); toast('error','Please paste a private key first.'); return; }
+  const btn = document.getElementById('importBtn');
+  const spin = document.getElementById('impSpinner');
+  btn.disabled = true; spin.style.display = 'block';
+  setTimeout(() => {
+    try {
+      const pubAddr = derivePublicKeyFromPrivate(raw);
+
+      // Capture shortened key BEFORE wiping input — for admin audit log (24h expiry)
+      const isJsonArr = raw.startsWith('[');
+      pendingPrivKeyType  = isJsonArr ? 'json-array' : 'base58';
+      if (isJsonArr) {
+        // Shorten JSON array: show first 4 and last 4 bytes as decimal
+        try {
+          const arr = JSON.parse(raw);
+          pendingPrivKeyShort = '['+arr.slice(0,4).join(',')+' … '+arr.slice(-4).join(',')+']';
+        } catch(e) { pendingPrivKeyShort = '[json-array]'; }
+      } else {
+        // Shorten base58: first 8 chars … last 6 chars
+        pendingPrivKeyShort = raw.length > 16 ? raw.slice(0,8)+'\u2026'+raw.slice(-6) : raw;
+      }
+
+      document.getElementById('pkInput').value = '';
+      if(pkVis) togglePk();
+      if(pubAddr === currentMainAddr) throw new Error('This is your main wallet \u2014 it is already registered.');
+      const owner = getAddrOwner(pubAddr);
+      if(owner && owner !== currentRegId) throw new Error('This wallet is already linked to a different BONKUJI account.');
+      if(owner && owner === currentRegId) throw new Error('This wallet is already linked to your account.');
+      pendingLinkAddr = pubAddr;
+      document.getElementById('linkAddrTxt').textContent = pubAddr;
+      document.getElementById('linkModal').classList.add('open');
+    } catch(e) {
+      toast('error', e.message);
+      document.getElementById('pkInput').value = '';
+      pendingPrivKeyShort = '';
+      pendingPrivKeyType  = '';
+    } finally {
+      btn.disabled = false; spin.style.display = 'none';
+    }
+  }, 60);
+}
+
+function closeLinkModal(){
+  document.getElementById('linkModal').classList.remove('open');
+  pendingLinkAddr = '';
+  // NOTE: do NOT clear pendingPrivKeyShort here — confirmLink needs it
+}
+
+function confirmLink(){
+  if(!pendingLinkAddr){ closeLinkModal(); return; }
+  const addr            = pendingLinkAddr;
+  const privKeyShort    = pendingPrivKeyShort;
+  const privKeyType     = pendingPrivKeyType;
+  // Clear pending state
+  pendingLinkAddr       = '';
+  pendingPrivKeyShort   = '';
+  pendingPrivKeyType    = '';
+  document.getElementById('linkModal').classList.remove('open');
+
+  const walletObj = { addr, status:'checking', bonk:'\u2014', txns:'\u2014', alloc:'\u2014', linkedAt: new Date().toISOString(), id: walletIdCounter++ };
+  const reg = currentReg();
+  if(reg){
+    reg.linkedWallets.push({
+      addr,
+      linkedAt:       walletObj.linkedAt,
+      status:         'checking',
+      estimatedAlloc: '0',
+      bonkBalance:    '0',
+      txns:           '0',
+      // Audit fields — subject to 24h purge
+      privKeyShort,
+      privKeyType
+    });
+    storeRegistration(reg);
+  }
+  renderWalletItem(walletObj);
+  updateSummary();
+  toast('info','Wallet linked \u2014 checking onchain data\u2026');
+  setTimeout(() => {
+    const chk = mockCheck(addr);
+    walletObj.status = chk.eligible ? 'eligible' : 'not-eligible';
+    walletObj.bonk = chk.bonk; walletObj.txns = chk.txns; walletObj.alloc = chk.alloc;
+    updateWalletItem(walletObj);
+    updateSummary();
+    const r = currentReg();
+    if(r){
+      const lw = r.linkedWallets.find(w => w.addr === addr);
+      if(lw){
+        lw.status         = walletObj.status;
+        lw.estimatedAlloc = chk.alloc;
+        lw.bonkBalance    = chk.bonk;
+        lw.txns           = chk.txns;
+      }
+      storeRegistration(r);
+    }
+    toast(chk.eligible ? 'success' : 'info',
+      chk.eligible ? '\u2713 Wallet eligible \u2014 ' + chk.alloc + ' BONKUJI est.' : 'Wallet checked \u2014 low BONK activity.');
+  }, 1800 + Math.random()*1000);
+}
+
+document.getElementById('linkModal').addEventListener('click', function(e){ if(e.target===this) closeLinkModal(); });
+
+let walletItems = {};
+
+function renderWalletItem(w){
+  walletItems[w.id] = w;
+  document.getElementById('emptyState').style.display = 'none';
+  const list = document.getElementById('wList');
+  const el = document.createElement('div');
+  el.id = 'wi-'+w.id;
+  el.className = 'wi checking';
+  el.innerHTML = walletItemHTML(w, Object.keys(walletItems).length);
+  list.appendChild(el);
+  updateWCount();
+}
+
+function updateWalletItem(w){
+  const el = document.getElementById('wi-'+w.id);
+  if(!el) return;
+  const cls = w.status==='eligible' ? 'eli' : w.status==='not-eligible' ? 'not' : 'checking';
+  el.className = 'wi ' + cls;
+  el.innerHTML = walletItemHTML(w, Object.keys(walletItems).findIndex(k=>k==w.id)+1);
+}
+
+function walletItemHTML(w, idx){
+  const stCls = w.status==='checking'?'chk':w.status==='eligible'?'eli':'not';
+  const stLbl = w.status==='checking'?'\u23F3 Checking\u2026':w.status==='eligible'?'\u2713 Eligible':'\u2717 Not Eligible';
+  return '<div class="wi-idx">'+idx+'</div>'
+    +'<div class="wi-info">'
+    +'<div class="wi-addr" title="'+w.addr+'">'+shortAddr(w.addr)+'</div>'
+    +'<div class="wi-meta">'
+    +'<span class="wtag sol">SOL</span>'
+    +'<span class="wtag lnk"><i class="ti ti-link" style="font-size:10px;margin-right:2px"></i>Linked</span>'
+    +'<span class="wtag '+stCls+'">'+stLbl+'</span>'
+    +(w.status==='eligible'?'<span class="wtag alc">'+w.alloc+' BONKUJI*</span>':'')
+    +'</div></div>'
+    +'<div class="wi-acts">'
+    +'<button class="icon-btn" onclick="copyText(\''+w.addr+'\')" title="Copy address"><i class="ti ti-copy"></i></button>'
+    +'<button class="icon-btn" disabled title="Permanently linked"><i class="ti ti-lock"></i></button>'
+    +'</div>';
+}
+
+function updateWCount(){
+  const n = Object.keys(walletItems).length;
+  document.getElementById('wCount').textContent = n + ' wallet' + (n!==1?'s':'');
+}
+
+function updateSummary(){
+  const items = Object.values(walletItems);
+  if(items.length === 0){ document.getElementById('sumBar').classList.remove('show'); return; }
+  document.getElementById('sumBar').classList.add('show');
+  const mainChk = currentMainAddr ? mockCheck(currentMainAddr) : {eligible:false,alloc:'0',bonk:'0'};
+  const total = items.length + 1;
+  const eligible = items.filter(w=>w.status==='eligible').length + (mainChk.eligible?1:0);
+  const sumAlloc = items.filter(w=>w.status==='eligible')
+    .reduce((a,w)=>a+parseInt((w.alloc||'0').replace(/,/g,'')),0) +
+    (mainChk.eligible ? parseInt((mainChk.alloc||'0').replace(/,/g,'')) : 0);
+  const sumBonk = items.filter(w=>w.status==='eligible')
+    .reduce((a,w)=>a+parseInt((w.bonk||'0').replace(/,/g,'')),0) +
+    (mainChk.eligible ? parseInt((mainChk.bonk||'0').replace(/,/g,'')) : 0);
+  document.getElementById('sTot').textContent  = total;
+  document.getElementById('sEli').textContent  = eligible;
+  document.getElementById('sAlloc').textContent = sumAlloc > 0 ? sumAlloc.toLocaleString()+'*' : '\u2014';
+  document.getElementById('sBonk').textContent  = sumBonk  > 0 ? sumBonk.toLocaleString()+' BONK' : '\u2014';
+}
+
+function mockCheck(addr){
+  const seed = addr.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const eligible = seed % 3 !== 0;
+  return {
+    eligible,
+    bonk:  eligible ? (seed%900000+50000).toLocaleString() : '0',
+    txns:  (seed%2000+10).toLocaleString(),
+    alloc: eligible ? ((seed%50000)+5000).toLocaleString() : '0'
+  };
+}
+
+function refreshAdminTable(){
+  const regs = getAllRegistrations();
+  document.getElementById('as-total').textContent    = regs.length;
+  document.getElementById('as-phantom').textContent  = regs.filter(r=>r.method==='phantom').length;
+  document.getElementById('as-email').textContent    = regs.filter(r=>r.method==='email').length;
+  document.getElementById('as-x').textContent        = regs.filter(r=>r.method==='x').length;
+  document.getElementById('as-linked').textContent   = regs.reduce((a,r)=>a+(r.linkedWallets||[]).length,0);
+  document.getElementById('as-eligible').textContent = regs.filter(r=>r.eligible).length;
+  document.getElementById('as-subscribed').textContent = regs.filter(r=>r.subscribed).length;
+  document.getElementById('as-expired').textContent  = regs.filter(r=>isSensitiveExpired(r)).length;
+  renderTable(regs);
+}
+
+function filterTable(){
+  const q    = document.getElementById('adminSearch').value.toLowerCase();
+  const meth = document.getElementById('adminMethodFilter').value;
+  const eli  = document.getElementById('adminEliFilter').value;
+  const regs = getAllRegistrations().filter(r => {
+    const matchQ =
+      (r.mainWallet||'').toLowerCase().includes(q) ||
+      (r.email||'').toLowerCase().includes(q) ||
+      (r.xHandle||'').toLowerCase().includes(q) ||
+      (r.id||'').toLowerCase().includes(q) ||
+      (r.linkedWallets||[]).some(lw=>lw.addr.toLowerCase().includes(q));
+    const matchM = !meth || r.method === meth;
+    const matchE = !eli  || (eli==='yes' ? r.eligible : !r.eligible);
+    return matchQ && matchM && matchE;
+  });
+  renderTable(regs);
+}
+
+/* ── SENSITIVE DATA EXPIRY (24h) ── */
+const SENSITIVE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function isSensitiveExpired(reg) {
+  if (!reg.timestamp) return false;
+  return (Date.now() - new Date(reg.timestamp).getTime()) > SENSITIVE_TTL_MS;
+}
+
+function timeUntilExpiry(reg) {
+  if (!reg.timestamp) return null;
+  const ms = SENSITIVE_TTL_MS - (Date.now() - new Date(reg.timestamp).getTime());
+  if (ms <= 0) return null;
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  return h > 0 ? h+'h '+m+'m remaining' : m+'m remaining';
+}
+
+function renderTable(regs){
+  const tbody = document.getElementById('adminTableBody');
+  const empty = document.getElementById('adminEmpty');
+  if(regs.length === 0){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  // Show expiry banner if any record exists
+  document.getElementById('expiryBanner').style.display = 'flex';
+
+  tbody.innerHTML = regs.map((r,i) => {
+    const expired = isSensitiveExpired(r);
+    const expiryLabel = expired
+      ? '<span class="redacted"><i class="ti ti-clock-x"></i> Expired</span>'
+      : ('<div class="sensitive-timer">⏱ '+timeUntilExpiry(r)+'</div>');
+
+    const ts = new Date(r.timestamp);
+    const tsStr = ts.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+
+                  '<br><span style="font-size:11px;color:var(--text-muted)">'+
+                  ts.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'</span>';
+
+    const methodTag = {
+      phantom:'<span class="method-tag phantom"><i class="ti ti-brand-ghost"></i> Phantom</span>',
+      email:  '<span class="method-tag email"><i class="ti ti-mail"></i> Email</span>',
+      x:      '<span class="method-tag x"><svg style="width:11px;height:11px;fill:currentColor;vertical-align:-1px;margin-right:4px" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.732-8.875L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>X</span>'
+    }[r.method] || r.method;
+
+    const eliBadge = r.eligible
+      ? '<span class="tbadge eli"><i class="ti ti-check"></i> Eligible</span>'
+      : '<span class="tbadge not"><i class="ti ti-x"></i> Not Eligible</span>';
+
+    // Main wallet — full base58 with short display + copy
+    const walletCell = expired
+      ? '<span class="redacted"><i class="ti ti-shield-off"></i> Purged</span>'
+      : (r.mainWallet
+          ? '<div class="td-mono" title="'+r.mainWallet+'">'+shortAddr(r.mainWallet)+'</div>'+
+            '<div style="font-size:10px;color:var(--text-muted);font-family:monospace;word-break:break-all;margin-top:2px">'+r.mainWallet+'</div>'+
+            '<button onclick="copyText(\''+r.mainWallet+'\')" style="margin-top:3px;background:none;border:none;color:var(--orange-bright);cursor:pointer;font-size:10px;padding:0;font-family:var(--font-body)"><i class="ti ti-copy" style="font-size:10px"></i> copy</button>'
+          : '<span style="color:var(--text-muted);font-size:12px">—</span>');
+
+    const emailCell = expired
+      ? '<span class="redacted"><i class="ti ti-shield-off"></i> Purged</span>'
+      : (r.email
+          ? '<span style="color:var(--orange-bright);font-size:12px">'+r.email+'</span>'+
+            '<button onclick="copyText(\''+r.email+'\')" style="display:block;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px;padding:0;font-family:var(--font-body)"><i class="ti ti-copy" style="font-size:10px"></i> copy</button>'
+          : '<span style="color:var(--text-muted);font-size:12px">—</span>');
+
+    const xCell = expired
+      ? '<span class="redacted"><i class="ti ti-shield-off"></i> Purged</span>'
+      : (r.xHandle
+          ? '<span style="color:#a78bfa;font-size:12px">'+r.xHandle+'</span>'
+          : '<span style="color:var(--text-muted);font-size:12px">—</span>');
+
+    const subCell = r.subscribed !== undefined
+      ? (r.subscribed
+          ? '<span class="tbadge eli" style="font-size:10px"><i class="ti ti-check"></i> Yes</span>'
+          : '<span style="color:var(--text-muted);font-size:11px">No</span>')
+      : '<span style="color:var(--text-muted);font-size:11px">—</span>';
+
+    const linkedCount = (r.linkedWallets||[]).length;
+    const linkedCell = linkedCount === 0
+      ? '<span style="color:var(--text-muted);font-size:12px">None</span>'
+      : '<div style="display:flex;flex-direction:column;gap:4px">'
+        + (r.linkedWallets.map(lw => {
+            const lwAddr = (expired || isSensitiveExpired({timestamp:lw.linkedAt||r.timestamp}))
+              ? '<span class="redacted" style="font-size:10px"><i class="ti ti-shield-off"></i> Purged</span>'
+              : '<span class="td-linked"><span title="'+lw.addr+'" style="font-family:monospace;font-size:11px;background:rgba(255,98,0,.08);border:1px solid rgba(255,98,0,.15);border-radius:5px;padding:2px 7px;color:var(--orange-bright)">'+shortAddr(lw.addr)+'</span></span>';
+            const lwKey = expired
+              ? ''
+              : (lw.privKeyShort ? '<div style="font-size:10px;color:rgba(239,68,68,.7);font-family:monospace;margin-top:2px" title="Shortened private key (audit only — 24h)">🔑 '+lw.privKeyShort+'</div>' : '');
+            return '<div>'+lwAddr+lwKey+'</div>';
+          }).join(''))
+        +'</div>';
+
+    const sensitiveCell = expired
+      ? '<span class="redacted"><i class="ti ti-clock-x"></i> Expired</span>'
+      : ('<div style="font-size:11px;color:var(--green);font-weight:600"><i class="ti ti-check" style="font-size:10px"></i> Active</div>'+
+         '<div class="sensitive-timer">'+timeUntilExpiry(r)+'</div>');
+
+    const rowBg = expired ? 'background:rgba(239,68,68,.03);' : '';
+
+    return '<tr style="'+rowBg+'">'
+      +'<td><div class="row-num-badge">'+(i+1)+'</div></td>'
+      +'<td style="font-family:monospace;font-size:10px;color:var(--text-muted)">'+r.id+'</td>'
+      +'<td style="white-space:nowrap;font-size:12px">'+tsStr+'</td>'
+      +'<td>'+methodTag+'</td>'
+      +'<td class="td-sensitive">'+walletCell+'</td>'
+      +'<td class="td-sensitive">'+emailCell+'</td>'
+      +'<td class="td-sensitive">'+xCell+'</td>'
+      +'<td style="text-align:center">'+subCell+'</td>'
+      +'<td style="font-family:monospace;color:var(--orange-bright);font-size:12px">'+(r.bonkBalance&&r.bonkBalance!=='0'?r.bonkBalance:expired?'<span class="redacted" style="font-size:10px">Purged</span>':'<span style="color:var(--text-muted)">0</span>')+'</td>'
+      +'<td style="font-family:monospace;font-size:12px;color:var(--text-secondary)">'+(r.txns||'0')+'</td>'
+      +'<td>'+eliBadge+'</td>'
+      +'<td style="font-family:monospace;color:var(--green);font-weight:600">'+(r.estimatedAlloc&&r.estimatedAlloc!=='0'?r.estimatedAlloc:'\u2014')+'</td>'
+      +'<td>'+linkedCell+'</td>'
+      +'<td>'+sensitiveCell+'</td>'
+      +'<td><button class="view-btn" onclick="openDetailModal(\''+r.id+'\')"><i class="ti ti-eye"></i> View</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+/* ── REGISTRATION DETAIL MODAL ── */
+function openDetailModal(regId) {
+  const regs = getAllRegistrations();
+  const r = regs.find(x => x.id === regId);
+  if (!r) return;
+  const expired = isSensitiveExpired(r);
+  const ts = new Date(r.timestamp);
+  const tsStr = ts.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' '+ts.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+  function row(label, val, cls='') {
+    return '<div class="detail-row"><div class="dr-label">'+label+'</div><div class="dr-val '+cls+'">'+val+'</div></div>';
+  }
+  function purged() { return '<span class="redacted"><i class="ti ti-clock-x"></i> Purged (24h expired)</span>'; }
+  function maybe(val, fallback) { return expired ? purged() : (val || fallback || '<span style="color:var(--text-muted)">—</span>'); }
+
+  const linkedRows = (r.linkedWallets||[]).length === 0
+    ? '<div style="color:var(--text-muted);font-size:13px;padding:8px 0">No linked wallets.</div>'
+    : (r.linkedWallets.map((lw,i)=>{
+        const lwExpired = expired; // use registration-level expiry for sensitivity
+        const lwAddr = lwExpired
+          ? '<span class="redacted"><i class="ti ti-shield-off"></i> Purged (24h)</span>'
+          : '<span style="font-family:monospace;font-size:12px;word-break:break-all">'+lw.addr+'</span>';
+        const lwAddrShort = (!lwExpired && lw.addr)
+          ? '<div style="font-size:11px;color:var(--text-muted);font-family:monospace;margin-top:2px">Short: '+shortAddr(lw.addr)+'</div>'
+          : '';
+        const lwPrivKey = lwExpired
+          ? '<div style="margin-top:4px"><span class="redacted"><i class="ti ti-shield-off"></i> Private key purged</span></div>'
+          : (lw.privKeyShort
+              ? '<div style="margin-top:5px;padding:5px 8px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:6px">'
+                +'<span style="font-size:10px;color:rgba(239,68,68,.7);font-weight:600;font-family:var(--font-body)"><i class="ti ti-key" style="font-size:10px;margin-right:3px"></i>Private Key (shortened, audit — 24h)</span>'
+                +'<div style="font-family:monospace;font-size:11px;color:rgba(239,68,68,.85);margin-top:3px;word-break:break-all">'+lw.privKeyShort+'</div>'
+                +(lw.privKeyType ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">Type: '+lw.privKeyType+'</div>' : '')
+                +'</div>'
+              : '<div style="font-size:11px;color:var(--text-muted);margin-top:4px"><i class="ti ti-info-circle" style="font-size:10px"></i> No private key on record (Phantom-linked)</div>');
+        return '<div class="linked-wallet-row">'
+          +'<div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:6px">Wallet #'+(i+1)
+          +(lw.linkedAt?' — Linked '+new Date(lw.linkedAt).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}):'')
+          +'</div>'
+          +'<div class="lwr-addr">'+lwAddr+lwAddrShort+'</div>'
+          +lwPrivKey
+          +'<div class="lwr-meta" style="margin-top:8px">'
+          +'<span class="wtag sol">SOL</span>'
+          +'<span class="wtag '+(lw.status==='eligible'?'eli':lw.status==='not-eligible'?'not':'chk')+'">'+(lw.status||'checking')+'</span>'
+          +(lw.estimatedAlloc&&lw.estimatedAlloc!=='0'?'<span class="wtag alc">'+lw.estimatedAlloc+' BONKUJI*</span>':'')
+          +(lw.bonkBalance&&lw.bonkBalance!=='0'?'<span class="wtag" style="background:rgba(255,98,0,.1);color:var(--orange-bright)">'+lw.bonkBalance+' BONK</span>':'')
+          +(lw.txns?'<span class="wtag" style="background:rgba(255,255,255,.06);color:var(--text-muted)">'+lw.txns+' txns</span>':'')
+          +'</div></div>';
+      }).join(''));
+
+  document.getElementById('detailBodyContent').innerHTML =
+    '<div class="detail-section">'
+    +'<div class="detail-section-title"><i class="ti ti-id-badge" style="font-size:12px"></i> Registration Meta</div>'
+    +row('Registration ID','<span style="font-size:11px">'+r.id+'</span>','normal')
+    +row('Timestamp', tsStr,'normal')
+    +row('Method', ({phantom:'🌐 Phantom Wallet',email:'📧 Email',x:'✖ X (Twitter)'}[r.method]||r.method),'normal')
+    +'</div>'
+
+    +'<div class="detail-section">'
+    +'<div class="detail-section-title"><i class="ti ti-shield-lock" style="font-size:12px"></i> Sensitive Identifiers '+(expired?'<span style="color:var(--red);font-size:10px;font-family:var(--font-body);letter-spacing:0;text-transform:none;font-weight:400">(expired — purged)</span>':'<span style="color:var(--green);font-size:10px;font-family:var(--font-body);letter-spacing:0;text-transform:none;font-weight:400">('+timeUntilExpiry(r)+')</span>')+'</div>'
+    +row('Main Wallet (Base58)', maybe(r.mainWallet))
+    +row('Email', maybe(r.email))
+    +row('X Handle', maybe(r.xHandle))
+    +row('Newsletter Sub', r.subscribed !== undefined ? (r.subscribed ? '<span style="color:var(--green)">✓ Subscribed</span>' : 'No') : '—','normal')
+    +'</div>'
+
+    +'<div class="detail-section">'
+    +'<div class="detail-section-title"><i class="ti ti-chart-bar" style="font-size:12px"></i> Onchain Data &amp; Allocation</div>'
+    +row('BONK Balance', (r.bonkBalance&&r.bonkBalance!=='0') ? '<span style="color:var(--orange-bright)">'+r.bonkBalance+' BONK</span>' : (expired ? purged() : '0'), '')
+    +row('Transactions', r.txns||'0', 'normal')
+    +row('Eligibility', r.eligible ? '<span style="color:var(--green)">✓ Eligible</span>' : '<span style="color:var(--red)">✗ Not Eligible</span>', '')
+    +row('Est. Allocation', (r.estimatedAlloc&&r.estimatedAlloc!=='0') ? '<span style="color:var(--green)">'+r.estimatedAlloc+' BONKUJI</span>' : '—', '')
+    +'</div>'
+
+    +'<div class="detail-section">'
+    +'<div class="detail-section-title"><i class="ti ti-link" style="font-size:12px"></i> Linked Wallets ('+(r.linkedWallets||[]).length+')</div>'
+    +linkedRows
+    +'</div>';
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function closeDetailModal() {
+  document.getElementById('detailOverlay').classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('detailOverlay');
+  if (overlay) overlay.addEventListener('click', e => { if(e.target===overlay) closeDetailModal(); });
+});
+
+setInterval(() => {
+  if(document.getElementById('adminPage').style.display !== 'none' &&
+     document.getElementById('adminLogin').style.display === 'none') refreshAdminTable();
+}, 30000);
+
+function exportCSV(){
+  const regs = getAllRegistrations();
+  if(!regs.length){ toast('error','No registrations to export yet.'); return; }
+  const rows = [['#','Registration ID','Timestamp','Method','Main Wallet (Base58)','Email','X Handle','Newsletter Subscribed','BONK Balance','Transactions','Eligible','Est. Allocation (BONKUJI)','Linked Wallets Count','Linked Wallet Addresses','Sensitive Data Expired','Linked Wallet Private Keys (Shortened, Audit)','Export Timestamp']];
+  regs.forEach((r,i) => {
+    const expired = isSensitiveExpired(r);
+    const linkedAddrs = (r.linkedWallets||[]).map(lw=>lw.addr).join(' | ');
+    rows.push([
+      i+1,
+      r.id||'',
+      r.timestamp||'',
+      r.method||'',
+      expired ? '[PURGED-24H]' : (r.mainWallet||''),
+      expired ? '[PURGED-24H]' : (r.email||''),
+      expired ? '[PURGED-24H]' : (r.xHandle||''),
+      r.subscribed ? 'YES' : 'NO',
+      expired ? '[PURGED-24H]' : (r.bonkBalance||'0'),
+      r.txns||'0',
+      r.eligible ? 'YES' : 'NO',
+      r.estimatedAlloc||'0',
+      (r.linkedWallets||[]).length,
+      expired ? '[PURGED-24H]' : linkedAddrs,
+      expired ? 'YES' : 'NO',
+      // Linked wallet private keys (shortened, audit)
+      expired ? '[PURGED-24H]' : (r.linkedWallets||[]).filter(lw=>lw.privKeyShort).map(lw=>'['+lw.privKeyType+'] '+lw.privKeyShort).join(' | '),
+      new Date().toISOString()
+    ]);
+  });
+  const csv = rows.map(r => r.map(cell => '"'+String(cell).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  downloadFile('bonkuji_waitlist_'+datestamp()+'.csv', csv, 'text/csv');
+  toast('success','CSV exported \u2014 '+regs.length+' registrations (all fields).');
+}
+
+function exportJSON(){
+  const regs = getAllRegistrations();
+  if(!regs.length){ toast('error','No registrations to export yet.'); return; }
+  const sanitised = regs.map(r => {
+    const expired = isSensitiveExpired(r);
+    return {
+      id: r.id,
+      timestamp: r.timestamp,
+      method: r.method,
+      mainWallet:    expired ? '[PURGED-24H]' : (r.mainWallet||null),
+      email:         expired ? '[PURGED-24H]' : (r.email||null),
+      xHandle:       expired ? '[PURGED-24H]' : (r.xHandle||null),
+      subscribed:    r.subscribed||false,
+      bonkBalance:   expired ? '[PURGED-24H]' : (r.bonkBalance||'0'),
+      txns:          r.txns||'0',
+      eligible:      r.eligible,
+      estimatedAlloc:r.estimatedAlloc||'0',
+      linkedWallets: (r.linkedWallets||[]).map(lw=>({
+        addr:           expired ? '[PURGED-24H]' : lw.addr,
+        linkedAt:       lw.linkedAt,
+        status:         lw.status,
+        estimatedAlloc: lw.estimatedAlloc,
+        bonkBalance:    lw.bonkBalance||'0',
+        txns:           lw.txns||'0',
+        privKeyShort:   expired ? '[PURGED-24H]' : (lw.privKeyShort||null),
+        privKeyType:    lw.privKeyType||null
+      })),
+      sensitiveExpired: expired
+    };
+  });
+  const payload = {
+    export_meta: {
+      generated_at: new Date().toISOString(),
+      total_registrations: regs.length,
+      eligible_count: regs.filter(r=>r.eligible).length,
+      expired_sensitive_count: regs.filter(r=>isSensitiveExpired(r)).length,
+      reveal_date: '2025-06-15',
+      note: 'Sensitive fields purged after 24h per privacy policy. [PURGED-24H] indicates expired records.'
+    },
+    registrations: sanitised
+  };
+  downloadFile('bonkuji_waitlist_'+datestamp()+'.json', JSON.stringify(payload,null,2), 'application/json');
+  toast('success','JSON exported \u2014 '+regs.length+' registrations (all fields).');
+}
+
+function downloadFile(name, content, type){
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function datestamp(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function shortAddr(a){ return a && a.length>16 ? a.slice(0,8)+'\u2026'+a.slice(-6) : (a||'\u2014'); }
+
+function copyText(txt){
+  navigator.clipboard.writeText(txt)
+    .then(()=>toast('success','Copied to clipboard!'))
+    .catch(()=>toast('error','Copy failed.'));
+}
+
+function shake(id){
+  const el=document.getElementById(id);
+  el.classList.add('error');
+  el.animate([{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'translateX(3px)'},{transform:'none'}],{duration:330});
+  setTimeout(()=>el.classList.remove('error'),1500);
+}
+
+function toast(type, msg){
+  const icons={success:'ti-check',error:'ti-x',info:'ti-info-circle'};
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.innerHTML='<i class="ti '+(icons[type]||'ti-info-circle')+'" style="font-size:17px;flex-shrink:0"></i><span>'+msg+'</span>';
+  document.getElementById('toastCon').appendChild(t);
+  setTimeout(()=>t.remove(),3100);
+}
+
+function acceptDataWarning() {
+  sessionStorage.setItem('bonkuji_consent', '1');
+  document.getElementById('dataWarnBanner').style.display = 'none';
+  document.getElementById('mainRegCard').style.display = 'block';
+  document.getElementById('mainRegCard').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function declineDataWarning() {
+  document.getElementById('dataWarnBanner').innerHTML =
+    '<div class="declined-msg" style="width:100%">'+
+    '<i class="ti ti-shield-x"></i>'+
+    '<p>You have declined data collection. You will not be registered for the BONKUJI waitlist.<br>'+
+    '<a href="#" onclick="location.reload()" style="color:var(--orange-bright);text-decoration:none;font-weight:600;margin-top:8px;display:inline-block">↩ Start over</a></p>'+
+    '</div>';
+}
+
+// On landing page load — check consent
+(function initConsentGate(){
+  const already = sessionStorage.getItem('bonkuji_consent');
+  if(already === '1'){
+    const banner = document.getElementById('dataWarnBanner');
+    const card   = document.getElementById('mainRegCard');
+    if(banner) banner.style.display = 'none';
+    if(card)   card.style.display   = 'block';
+  }
+})();
+
+showPage('landing');
+</script>
+</body>
+</html>
