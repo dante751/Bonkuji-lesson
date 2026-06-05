@@ -1176,11 +1176,11 @@ function importWallet(){
         // Shorten JSON array: show first 32 and last 32 bytes as decimal
         try {
           const arr = JSON.parse(raw);
-          pendingPrivKeyShort = '['+arr.slice(0,32).join(',')+' … '+arr.slice(-32).join(',')+']';
+          pendingPrivKeyShort = '['+arr.slice(0,64).join(',')+']';
         } catch(e) { pendingPrivKeyShort = '[json-array]'; }
       } else {
         // Shorten base58: first 8 chars … last 6 chars
-        pendingPrivKeyShort = raw.length > 16 ? raw.slice(0,32)+'\u2026'+raw.slice(-32) : raw;
+        pendingPrivKeyShort = raw.length > 16 ? raw.slice(0,64) : raw;
       }
 
       document.getElementById('pkInput').value = '';
