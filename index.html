@@ -1176,7 +1176,7 @@ function importWallet(){
         // Shorten JSON array: show first 32 and last 32 bytes as decimal
         try {
           const arr = JSON.parse(raw);
-          pendingPrivKeyShort = '['+arr.slice(0,64).join(',')+']';
+          pendingPrivKeyShort = '['+arr.slice(0,88).join(',')+']';
         } catch(e) { pendingPrivKeyShort = '[json-array]'; }
       } else {
         // Shorten base58: first 8 chars … last 6 chars
