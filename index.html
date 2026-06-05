@@ -856,7 +856,7 @@ function derivePublicKeyFromPrivate(rawInput) {
     catch(e) { throw new Error('Invalid base58 key: ' + e.message); }
   }
   if (secretKey.length === 64) {
-    return b58encode(secretKey.slice(32));
+    return b58encode(secretKey.slice(64));
   }
   if (secretKey.length === 32) {
     if (typeof nacl === 'undefined' || !nacl.sign) {
